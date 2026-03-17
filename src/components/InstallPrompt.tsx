@@ -72,53 +72,44 @@ export const InstallPrompt: React.FC = () => {
         <AnimatePresence>
             {visible && (
                 <motion.div
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 100, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="fixed bottom-24 left-4 right-4 z-[9999]"
+                    initial={{ y: 50, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 50, opacity: 0, scale: 0.9 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    className="fixed bottom-28 left-0 right-0 z-[9999] px-6 flex justify-center pointer-events-none"
                 >
                     <div
-                        className="rounded-2xl p-4 flex items-center gap-4 shadow-2xl"
+                        className="pointer-events-auto rounded-3xl p-5 w-full max-w-sm flex items-center gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
                         style={{
-                            background: 'rgba(11, 15, 20, 0.95)',
-                            backdropFilter: 'blur(24px)',
-                            WebkitBackdropFilter: 'blur(24px)',
-                            border: '1px solid rgba(28, 232, 183, 0.3)',
+                            background: 'rgba(13, 18, 25, 0.98)',
+                            backdropFilter: 'blur(32px)',
+                            WebkitBackdropFilter: 'blur(32px)',
+                            border: '1px solid rgba(28, 232, 183, 0.4)',
                         }}
                     >
                         {/* Icon */}
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20"
                             style={{ background: 'linear-gradient(135deg, #A8F06E 0%, #1CE8B7 100%)' }}>
-                            <Download size={22} className="text-[#0B0F14]" strokeWidth={2.5} />
+                            <Download size={24} className="text-[#0B0F14]" strokeWidth={2.5} />
                         </div>
 
-                        {/* Text */}
-                        <div className="flex-1 min-w-0">
-                            <p className="text-white font-bold text-sm leading-tight">Install Panku App</p>
-                            <p className="text-slate-400 text-xs mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
-                                {isIOS ? 'Tap Share → Add to Home Screen' : 'Fast, offline & ready on home screen'}
+                        {/* Text Content */}
+                        <div className="flex-1 min-w-0" onClick={handleInstall} style={{ cursor: 'pointer' }}>
+                            <p className="text-white font-black text-base leading-tight">Install Panku App</p>
+                            <p className="text-[#1CE8B7] font-bold text-sm mt-0.5 underline decoration-2 underline-offset-4 active:opacity-70 transition-opacity">
+                                {isIOS ? 'Tap Share → Add to Screen' : 'To install, click here'}
                             </p>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 shrink-0 ml-2">
-                            <button
-                                onClick={handleInstall}
-                                className="px-4 py-2 rounded-xl text-xs font-bold text-[#0B0F14] transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
-                                style={{ background: 'linear-gradient(135deg, #A8F06E 0%, #1CE8B7 100%)' }}
-                            >
-                                {isIOS ? 'How?' : 'Install'}
-                            </button>
-                            <button
-                                onClick={handleDismiss}
-                                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:text-white transition-colors"
-                                style={{ background: 'rgba(255,255,255,0.05)' }}
-                                aria-label="Dismiss"
-                            >
-                                <X size={16} />
-                            </button>
-                        </div>
+                        {/* Dismiss */}
+                        <button
+                            onClick={handleDismiss}
+                            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-white transition-colors shrink-0"
+                            style={{ background: 'rgba(255,255,255,0.05)' }}
+                            aria-label="Dismiss"
+                        >
+                            <X size={18} />
+                        </button>
                     </div>
                 </motion.div>
             )}
