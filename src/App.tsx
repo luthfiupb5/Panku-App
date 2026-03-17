@@ -5,6 +5,7 @@ import { HomeScreen } from './screens/HomeScreen';
 import { MembersScreen } from './screens/MembersScreen';
 import { ExpensesScreen } from './screens/ExpensesScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
+import { InstallPrompt } from './components/InstallPrompt';
 import { Users, Receipt, PieChart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -109,6 +110,7 @@ export const App: React.FC = () => (
             <div className="absolute inset-0 bg-[#05080c] mix-blend-overlay opacity-90"></div>
         </div>
         <AppContent />
+        <InstallPrompt />
     </AppProvider>
 );
 

@@ -9,25 +9,79 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['assets/favicon.png', 'assets/logo-darkbg.png', 'assets/logo-lightbg.png'],
+      includeAssets: [
+        'Assets/favicon.png',
+        'Assets/icon-darkbg.png',
+        'Assets/icon-lightbg.png',
+        'Assets/logo-darkbg.png',
+        'Assets/logo-lightbg.png',
+      ],
       manifest: {
         name: 'Panku App',
         short_name: 'Panku',
-        description: 'Split expenses, stay friends.',
-        theme_color: '#05080c',
+        description: 'Split group expenses easily. Track who paid what and instantly calculate who owes whom.',
+        theme_color: '#1CE8B7',
+        background_color: '#0B0F14',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        orientation: 'portrait',
+        categories: ['finance', 'utilities'],
         icons: [
           {
-            src: 'assets/icon-darkbg.png',
-            sizes: '512x512',
-            type: 'image/png'
+            src: 'Assets/icon-darkbg.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any'
           },
           {
-             src: 'assets/icon-darkbg.png',
-             sizes: '192x192',
-             type: 'image/png'
+            src: 'Assets/icon-darkbg.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: 'Assets/icon-darkbg.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ]
-      }
+      },
+      workbox: {
+        // Cache strategies
+        runtimeCaching: [
+          {
+            // Cache the app shell (HTML, JS, CSS)
+            urlPattern: /^https?:\/\/.*\/(assets|src)\//,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'app-shell-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
+          {
+            // Cache images with CacheFirst
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 60, // 60 days
+              },
+            },
+          },
+        ],
+        // Pre-cache all static assets built by Vite
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+      },
+      devOptions: {
+        enabled: true, // Enable PWA in dev mode for testing
+      },
     })
   ],
 })
