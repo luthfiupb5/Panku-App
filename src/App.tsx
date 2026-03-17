@@ -8,6 +8,7 @@ import { ResultsScreen } from './screens/ResultsScreen';
 import { InstallPrompt } from './components/InstallPrompt';
 import { Users, Receipt, PieChart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 
 type Tab = 'members' | 'expenses' | 'results';
 
@@ -111,6 +112,7 @@ export const App: React.FC = () => (
         </div>
         <AppContent />
         <InstallPrompt />
+        <Analytics />
     </AppProvider>
 );
 
