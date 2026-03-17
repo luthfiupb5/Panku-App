@@ -12,17 +12,36 @@ const DISMISSED_KEY = 'panku-install-dismissed';
 export const InstallPrompt: React.FC = () => {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [visible, setVisible] = useState(false);
+    const [isIOS, setIsIOS] = useState(false);
 
     useEffect(() => {
+        // Check if iOS
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+        setIsIOS(isIOSDevice);
+
+        // Debug logs
+        console.log('[PWA] Standalone mode:', window.matchMedia('(display-mode: standalone)').matches);
+        console.log('[PWA] Dismissed:', !!localStorage.getItem(DISMISSED_KEY));
+        console.log('[PWA] iOS detected:', isIOSDevice);
+
         // Don't show if already running as installed PWA
-        if (window.matchMedia('(display-mode: standalone)').matches) return;
-        // Don't show if user already dismissed
-        if (localStorage.getItem(DISMISSED_KEY)) return;
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+             console.log('[PWA] Already in standalone mode');
+             return;
+        }
+        
+        // Show automatically for iOS if not dismissed
+        if (isIOSDevice && !localStorage.getItem(DISMISSED_KEY)) {
+            setVisible(true);
+        }
 
         const handler = (e: Event) => {
+            console.log('[PWA] beforeinstallprompt event fired');
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
-            setVisible(true);
+            if (!localStorage.getItem(DISMISSED_KEY)) {
+                setVisible(true);
+            }
         };
 
         window.addEventListener('beforeinstallprompt', handler);
@@ -30,6 +49,11 @@ export const InstallPrompt: React.FC = () => {
     }, []);
 
     const handleInstall = async () => {
+        if (isIOS) {
+            alert('To install Panku on your iPhone: \n1. Tap the Share button (square with arrow up) \n2. Scroll down and tap "Add to Home Screen"');
+            handleDismiss();
+            return;
+        }
         if (!deferredPrompt) return;
         await deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
@@ -52,46 +76,47 @@ export const InstallPrompt: React.FC = () => {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="fixed bottom-24 left-4 right-4 z-50"
+                    className="fixed bottom-24 left-4 right-4 z-[9999]"
                 >
                     <div
-                        className="rounded-2xl p-4 flex items-center gap-4"
+                        className="rounded-2xl p-4 flex items-center gap-4 shadow-2xl"
                         style={{
-                            background: 'rgba(20, 26, 33, 0.92)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
-                            border: '1px solid rgba(28, 232, 183, 0.25)',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)'
+                            background: 'rgba(11, 15, 20, 0.95)',
+                            backdropFilter: 'blur(24px)',
+                            WebkitBackdropFilter: 'blur(24px)',
+                            border: '1px solid rgba(28, 232, 183, 0.3)',
                         }}
                     >
                         {/* Icon */}
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                             style={{ background: 'linear-gradient(135deg, #A8F06E 0%, #1CE8B7 100%)' }}>
-                            <Download size={20} className="text-[#0B0F14]" strokeWidth={2.5} />
+                            <Download size={22} className="text-[#0B0F14]" strokeWidth={2.5} />
                         </div>
 
                         {/* Text */}
                         <div className="flex-1 min-w-0">
-                            <p className="text-[#F8FAFC] font-bold text-sm leading-tight">Install Panku</p>
-                            <p className="text-[#64748B] text-xs mt-0.5">Split expenses faster, works offline</p>
+                            <p className="text-white font-bold text-sm leading-tight">Install Panku App</p>
+                            <p className="text-slate-400 text-xs mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
+                                {isIOS ? 'Tap Share → Add to Home Screen' : 'Fast, offline & ready on home screen'}
+                            </p>
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
                             <button
                                 onClick={handleInstall}
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#0B0F14] transition-all active:scale-95"
+                                className="px-4 py-2 rounded-xl text-xs font-bold text-[#0B0F14] transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
                                 style={{ background: 'linear-gradient(135deg, #A8F06E 0%, #1CE8B7 100%)' }}
                             >
-                                Install
+                                {isIOS ? 'How?' : 'Install'}
                             </button>
                             <button
                                 onClick={handleDismiss}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#94A3B8] transition-colors"
+                                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:text-white transition-colors"
                                 style={{ background: 'rgba(255,255,255,0.05)' }}
                                 aria-label="Dismiss"
                             >
-                                <X size={14} />
+                                <X size={16} />
                             </button>
                         </div>
                     </div>
@@ -100,3 +125,4 @@ export const InstallPrompt: React.FC = () => {
         </AnimatePresence>
     );
 };
+
