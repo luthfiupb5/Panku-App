@@ -1,0 +1,27 @@
+# Expense Splitter PWA
+
+## Project Setup
+- [ ] Initialize Vite + React + TypeScript project
+- [ ] Install dependencies (TailwindCSS, Recharts, jsPDF, html2canvas, lucide-react, uuid)
+- [ ] Setup TailwindCSS configuration
+- [ ] Setup PWA capabilities (vite-plugin-pwa, manifest.json)
+
+## Core State & Logic (Context/Hooks)
+- [ ] Create Types (Event, Member, Expense, Payment, Settlement, AppState)
+- [ ] Create `useExpenseManager` hook / context to manage local state
+- [ ] Implement `localStorage` persistence layer (with reload protection)
+- [ ] Implement expense calculation logic (total expense, individual balance)
+- [ ] Implement settlement algorithm (greedy match min-max)
+
+## UI Development
+- [ ] Global Layout & Navigation (Header, Footer)
+- [ ] Home / Landing Page (Create new event)
+- [ ] Members Management Page (Add/remove members)
+- [ ] Expense List Page (List of expenses, total summary)
+- [ ] Add/Edit Expense Form (Title, amount, paid by, participants)
+- [ ] Results & Settlement Page (Balances, charts, settlements)
+
+## Reports & PDF Export
+- [ ] Implement Summary Visualizations (Pie Chart, Bar Chart, Balance Chart)
+- [ ] Implement Print/PDF Export functionality
+- [ ] Clean up and finalize PWA installation prompts
