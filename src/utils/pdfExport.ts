@@ -94,20 +94,70 @@ export const generatePDF = async (event: SplitterEvent) => {
         pdf.setLineWidth(0.5);
         pdf.line(margin, currentY, pageWidth - margin, currentY);
 
-        // --- Summary Stats ---
-        currentY += 15;
+        // --- Mathematical Logic ---
+        const balances = calculateBalances(event);
         const totalExp = event.expenses.reduce((s, e) => s + e.amount, 0);
         
-        addText('Total Expense:', margin, currentY, 12, secondaryText);
-        addText(formatForPDF(totalExp), margin + 40, currentY, 14, primaryText, true);
-        
-        currentY += 8;
-        addText('Members count:', margin, currentY, 10, secondaryText);
-        addText(event.members.length.toString(), margin + 40, currentY, 10, primaryText, true);
+        const isFundMode = event.mode === 'fund';
+        const tFund = isFundMode ? (event.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
+        const tSpentFromFund = isFundMode ? event.expenses.reduce((s, e) => {
+            const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
+            return s + (e.amount - membersPaid);
+        }, 0) : 0;
+        const rFund = tFund - tSpentFromFund;
 
-        currentY += 6;
-        addText('Expenses count:', margin, currentY, 10, secondaryText);
-        addText(event.expenses.length.toString(), margin + 40, currentY, 10, primaryText, true);
+        let balanceList = [...balances];
+        if (isFundMode && Math.abs(rFund) > 0.01) {
+            balanceList.push({
+                memberId: 'FUND_BOX',
+                totalPaid: 0,
+                totalShare: 0,
+                balance: -rFund 
+            });
+        }
+        
+        const settlements = calculateSettlements(balanceList);
+        
+        const getMemberName = (id: string) => {
+            if (id === 'FUND_BOX') return 'Group Fund [Box]';
+            return event.members.find(m => m.id === id)?.name ?? 'Unknown';
+        };
+
+        // --- Summary Stats ---
+        currentY += 15;
+        
+        if (isFundMode) {
+            addText('Fund Summary', margin, currentY, 14, primaryText, true);
+            currentY += 8;
+            addText('Initial Fund:', margin, currentY, 11, secondaryText);
+            addText(formatForPDF(tFund), margin + 40, currentY, 11, primaryText, true);
+
+            currentY += 7;
+            addText('Spent from Fund:', margin, currentY, 11, secondaryText);
+            addText(formatForPDF(tSpentFromFund), margin + 40, currentY, 11, '#EF4444', true);
+
+            currentY += 7;
+            addText('Remaining Fund:', margin, currentY, 11, secondaryText);
+            addText(formatForPDF(rFund), margin + 40, currentY, 11, rFund >= 0 ? accent : '#EF4444', true);
+            
+            currentY += 12;
+            pdf.setDrawColor('#E8EDF2');
+            pdf.line(margin, currentY, pageWidth - margin, currentY);
+            currentY += 15;
+        }
+
+        addText('Event Summary', margin, currentY, 14, primaryText, true);
+        currentY += 8;
+        addText('Total Event Cost:', margin, currentY, 11, secondaryText);
+        addText(formatForPDF(totalExp), margin + 40, currentY, 11, primaryText, true);
+        
+        currentY += 7;
+        addText('Members count:', margin, currentY, 11, secondaryText);
+        addText(event.members.length.toString(), margin + 40, currentY, 11, primaryText, true);
+
+        currentY += 7;
+        addText('Expenses count:', margin, currentY, 11, secondaryText);
+        addText(event.expenses.length.toString(), margin + 40, currentY, 11, primaryText, true);
 
         currentY += 12;
         pdf.setDrawColor('#E8EDF2');
@@ -117,9 +167,6 @@ export const generatePDF = async (event: SplitterEvent) => {
         currentY += 15;
         addText('Member Balances', margin, currentY, 14, primaryText, true);
         currentY += 10;
-
-        const balances = calculateBalances(event);
-        const getMemberName = (id: string) => event.members.find(m => m.id === id)?.name ?? 'Unknown';
 
         balances.forEach((b) => {
             const name = getMemberName(b.memberId);
@@ -164,21 +211,21 @@ export const generatePDF = async (event: SplitterEvent) => {
         addText('Settlements (Who pays whom)', margin, currentY, 14, primaryText, true);
         currentY += 10;
 
-        const settlements = calculateSettlements(balances);
-
         if (settlements.length === 0) {
             addText('All balances are settled! No payments needed.', margin, currentY, 11, accent, true);
         } else {
             settlements.forEach((s) => {
                 const fromName = getMemberName(s.from);
                 const toName = getMemberName(s.to);
+                const isFromFund = s.from === 'FUND_BOX';
+                const isToFund = s.to === 'FUND_BOX';
                 
                 // Get width of name in mm to calculate X position
                 pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'bold');
                 const fromWidth = pdf.getStringUnitWidth(fromName) * 11 / pdf.internal.scaleFactor;
                 
-                addText(fromName, margin, currentY, 11, primaryText, true);
+                addText(fromName, margin, currentY, 11, isFromFund ? accent : primaryText, true);
                 
                 // Draw a nice "PAYS" badge instead of an arrow
                 const badgeText = "PAYS";
@@ -195,7 +242,7 @@ export const generatePDF = async (event: SplitterEvent) => {
                 addText(badgeText, badgeX + 2, currentY + 0.3, 7, '#FFFFFF', true);
                 
                 const toNameX = badgeX + badgeWidth + 3;
-                addText(toName, toNameX, currentY, 11, primaryText, true);
+                addText(toName, toNameX, currentY, 11, isToFund ? accent : primaryText, true);
                 
                 addText(formatForPDF(s.amount), pageWidth - margin, currentY, 12, primaryText, true, 'right');
                 

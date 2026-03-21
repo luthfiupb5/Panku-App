@@ -33,6 +33,7 @@ export const ExpensesScreen: React.FC = () => {
     if (!currentEvent) return null;
 
     const total = currentEvent.expenses.reduce((s, e) => s + e.amount, 0);
+    const isFundMode = currentEvent.mode === 'fund';
 
     return (
         <div>
@@ -110,16 +111,33 @@ export const ExpensesScreen: React.FC = () => {
                                                     {expense.participants.length} people
                                                 </span>
                                             </div>
-                                            <div className="flex items-center flex-wrap gap-1">
-                                                <span className="text-xs text-[#66707A]">Paid by</span>
-                                                {paidBy.map(({ name }) => (
-                                                    <span key={name} className="flex items-center gap-1">
-                                                        <span className={`w-4 h-4 rounded-full ${getAvatarClass(name)} text-[8px] font-bold text-[#0B0F14] flex items-center justify-center`}>
-                                                            {name.charAt(0).toUpperCase()}
-                                                        </span>
-                                                        <span className="text-xs text-[#9AA4AF]">{name}</span>
-                                                    </span>
-                                                ))}
+                                            <div className="flex items-center flex-wrap gap-1 mt-1">
+                                                {(() => {
+                                                    const membersPaidSum = expense.paidBy.reduce((acc, p) => acc + p.amount, 0);
+                                                    const fundPaidAmount = expense.amount - membersPaidSum;
+                                                    const hasFundPayment = isFundMode && fundPaidAmount > 0.01;
+                                                    
+                                                    if (!hasFundPayment && paidBy.length === 0) return null;
+
+                                                    return (
+                                                        <>
+                                                            <span className="text-xs text-[#66707A]">Paid by</span>
+                                                            {hasFundPayment && (
+                                                                <span className="text-[10px] text-[#2DD4BF] font-black uppercase tracking-wider bg-[#2DD4BF]/10 px-1.5 py-0.5 rounded flex items-center border border-[#2DD4BF]/20">
+                                                                    Fund {(paidBy.length > 0) && `(${formatCurrency(fundPaidAmount)})`}
+                                                                </span>
+                                                            )}
+                                                            {paidBy.map(({ name, amount }) => (
+                                                                <span key={name} className="flex items-center gap-1">
+                                                                    <span className={`w-4 h-4 rounded-full ${getAvatarClass(name)} text-[8px] font-bold text-[#0B0F14] flex items-center justify-center shrink-0`}>
+                                                                        {name.charAt(0).toUpperCase()}
+                                                                    </span>
+                                                                    <span className="text-xs text-[#9AA4AF]">{name} {(hasFundPayment || paidBy.length > 1) ? `(${formatCurrency(amount)})` : ''}</span>
+                                                                </span>
+                                                            ))}
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
                                         </div>
 

@@ -16,15 +16,16 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
     const [title, setTitle] = useState('');
     const [amount, setAmount] = useState('');
     const [isMultiPayer, setIsMultiPayer] = useState(false);
-    const [singlePayerId, setSinglePayerId] = useState(currentEvent?.members[0]?.id ?? '');
+    const isFundMode = currentEvent?.mode === 'fund';
+    const [singlePayerId, setSinglePayerId] = useState(isFundMode ? 'FUND' : (currentEvent?.members[0]?.id ?? ''));
     const [multiPayerAmounts, setMultiPayerAmounts] = useState<Record<string, string>>({});
     const [participants, setParticipants] = useState<Set<string>>(
         new Set(currentEvent?.members.map(m => m.id))
     );
 
     useEffect(() => {
-        if (currentEvent?.members[0] && !singlePayerId) setSinglePayerId(currentEvent.members[0].id);
-    }, [currentEvent, singlePayerId]);
+        if (currentEvent?.members[0] && !singlePayerId) setSinglePayerId(isFundMode ? 'FUND' : currentEvent.members[0].id);
+    }, [currentEvent, singlePayerId, isFundMode]);
 
     if (!currentEvent || currentEvent.members.length === 0) {
         return (
@@ -61,7 +62,11 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
             });
             if (!paidBy.length) { alert('Enter payment amounts.'); return; }
         } else {
-            paidBy = [{ memberId: singlePayerId, amount: totalAmt }];
+            if (singlePayerId === 'FUND') {
+                paidBy = []; 
+            } else {
+                paidBy = [{ memberId: singlePayerId, amount: totalAmt }];
+            }
         }
 
         addExpense({ id: crypto.randomUUID(), title: title.trim(), amount: totalAmt, paidBy, participants: Array.from(participants) } as Expense);
@@ -130,12 +135,33 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                             onChange={e => setSinglePayerId(e.target.value)}
                             className="panku-input"
                         >
+                            {isFundMode && <option value="FUND">Group Fund</option>}
                             {currentEvent.members.map(m => (
                                 <option key={m.id} value={m.id}>{m.name}</option>
                             ))}
                         </select>
                     ) : (
                         <div className="space-y-3">
+                            {isFundMode && (
+                                <div className="flex items-center gap-3">
+                                    <span className="w-7 h-7 rounded-full bg-[#2DD4BF]/10 text-[10px] font-bold text-[#2DD4BF] border border-[#2DD4BF]/20 flex items-center justify-center shrink-0">
+                                        FD
+                                    </span>
+                                    <span className="flex-1 text-sm text-[#2DD4BF] font-medium">Group Fund</span>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#66707A] text-sm">₹</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            placeholder="0"
+                                            value={multiPayerAmounts['FUND'] ?? ''}
+                                            onChange={e => setMultiPayerAmounts({ ...multiPayerAmounts, ['FUND']: e.target.value })}
+                                            className="panku-input w-28 pl-7 pr-3 py-2 text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                             {currentEvent.members.map(m => (
                                 <div key={m.id} className="flex items-center gap-3">
                                     <span className={`w-7 h-7 rounded-full ${getAvatarClass(m.name)} text-[10px] font-bold text-[#0B0F14] flex items-center justify-center shrink-0`}>

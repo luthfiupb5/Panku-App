@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { SplitterEvent, Member, Expense } from '../types';
+import type { SplitterEvent, Member, Expense, FundDeposit } from '../types';
 
 interface AppContextType {
     events: SplitterEvent[];
     activeEventId: string | null;
     currentEvent: SplitterEvent | null;
-    createEvent: (name: string, date: string, members?: Member[]) => void;
+    createEvent: (name: string, date: string, members?: Member[], mode?: 'normal' | 'fund') => void;
     setActiveEvent: (id: string | null) => void;
     deleteEvent: (id: string) => void;
     clearAllEvents: () => void;
@@ -13,6 +13,8 @@ interface AppContextType {
     removeMember: (memberId: string) => void;
     addExpense: (expense: Expense) => void;
     removeExpense: (expenseId: string) => void;
+    addFundDeposit: (deposit: Omit<FundDeposit, 'id'>) => void;
+    removeFundDeposit: (depositId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -47,13 +49,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const currentEvent = events.find(e => e.id === activeEventId) ?? null;
 
-    const createEvent = (name: string, date: string, initialMembers: Member[] = []) => {
+    const createEvent = (name: string, date: string, initialMembers: Member[] = [], mode: 'normal' | 'fund' = 'normal') => {
         const newEvent: SplitterEvent = {
             id: crypto.randomUUID(),
             name,
             date,
             members: initialMembers,
-            expenses: []
+            expenses: [],
+            mode,
+            fundDeposits: mode === 'fund' ? [] : undefined
         };
         setEvents(prev => [newEvent, ...prev]);
         setActiveEventIdState(newEvent.id);
@@ -107,6 +111,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ));
     };
 
+    const addFundDeposit = (deposit: Omit<FundDeposit, 'id'>) => {
+        setEvents(prev => prev.map(e =>
+            e.id === activeEventId && e.mode === 'fund'
+                ? { ...e, fundDeposits: [...(e.fundDeposits || []), { ...deposit, id: crypto.randomUUID() }] }
+                : e
+        ));
+    };
+
+    const removeFundDeposit = (depositId: string) => {
+        setEvents(prev => prev.map(e =>
+            e.id === activeEventId && e.mode === 'fund'
+                ? { ...e, fundDeposits: (e.fundDeposits || []).filter(d => d.id !== depositId) }
+                : e
+        ));
+    };
+
     return (
         <AppContext.Provider value={{
             events,
@@ -120,6 +140,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             removeMember,
             addExpense,
             removeExpense,
+            addFundDeposit,
+            removeFundDeposit,
         }}>
             {children}
         </AppContext.Provider>

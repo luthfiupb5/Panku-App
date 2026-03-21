@@ -14,7 +14,21 @@ export const DashboardScreen: React.FC = () => {
 
     if (!currentEvent) return null;
 
-    const total = currentEvent.expenses.reduce((s, e) => s + e.amount, 0);
+    const totalEventCost = currentEvent.expenses.reduce((s, e) => s + e.amount, 0);
+
+    const isFundMode = currentEvent.mode === 'fund';
+    const totalFund = isFundMode ? (currentEvent.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
+    
+    // In Fund Mode, the "Spent" from the fund is the total cost minus amounts paid out-of-pocket
+    const totalSpentFromFund = isFundMode 
+        ? currentEvent.expenses.reduce((s, e) => {
+            const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
+            return s + (e.amount - membersPaid);
+        }, 0) 
+        : totalEventCost;
+
+    const remainingFund = totalFund - totalSpentFromFund;
+    const usagePercent = totalFund > 0 ? Math.min((totalSpentFromFund / totalFund) * 100, 100) : 0;
 
     const handleAddMember = (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,12 +57,44 @@ export const DashboardScreen: React.FC = () => {
                 className="relative rounded-[24px] p-6 overflow-hidden shadow-[0_8px_32px_rgba(45,212,191,0.25)] border border-white/20 bg-teal-gradient"
             >
                 <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/30 rounded-full blur-xl mix-blend-overlay" />
-                <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Event Cost</p>
-                <h3 className="text-4xl font-black text-[#030609] tracking-tight">{formatCurrency(total)}</h3>
-                <div className="mt-4 pt-4 border-t border-[#030609]/15 flex justify-between text-sm relative z-10">
-                    <span className="text-[#030609]/70"><span className="font-bold text-[#030609]">{currentEvent.expenses.length}</span> Expenses</span>
-                    <span className="text-[#030609]/70"><span className="font-bold text-[#030609]">{currentEvent.members.length}</span> Members</span>
-                </div>
+                
+                {isFundMode ? (
+                    <>
+                        <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Trip Fund</p>
+                        <h3 className="text-4xl font-black text-[#030609] tracking-tight mb-5">{formatCurrency(totalFund)}</h3>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
+                            <div>
+                                <p className="text-[#030609]/70 text-[10px] font-bold uppercase tracking-wider mb-0.5">Spent</p>
+                                <p className="font-bold text-[#030609] text-lg leading-none">{formatCurrency(totalSpentFromFund)}</p>
+                            </div>
+                            <div>
+                                <p className="text-[#030609]/70 text-[10px] font-bold uppercase tracking-wider mb-0.5">Remaining</p>
+                                <p className="font-bold text-[#030609] text-lg leading-none">{formatCurrency(remainingFund)}</p>
+                            </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="bg-[#030609]/10 rounded-full h-1.5 w-full mb-1 relative z-10 overflow-hidden">
+                            <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${usagePercent}%` }}
+                                transition={{ duration: 1, ease: 'easeOut' }}
+                                className={`h-full ${remainingFund < 0 ? 'bg-red-500' : 'bg-[#030609]'}`}
+                            />
+                        </div>
+                        <p className="text-[10px] text-[#030609]/70 font-semibold text-right relative z-10">{usagePercent.toFixed(0)}% Used</p>
+                    </>
+                ) : (
+                    <>
+                        <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Event Cost</p>
+                        <h3 className="text-4xl font-black text-[#030609] tracking-tight">{formatCurrency(totalEventCost)}</h3>
+                        <div className="mt-4 pt-4 border-t border-[#030609]/15 flex justify-between text-sm relative z-10">
+                            <span className="text-[#030609]/70"><span className="font-bold text-[#030609]">{currentEvent.expenses.length}</span> Expenses</span>
+                            <span className="text-[#030609]/70"><span className="font-bold text-[#030609]">{currentEvent.members.length}</span> Members</span>
+                        </div>
+                    </>
+                )}
             </motion.div>
 
             {/* Members Section */}

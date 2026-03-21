@@ -10,17 +10,49 @@ const getAvatarClass = (name: string) => AVATAR[name.charCodeAt(0) % AVATAR.leng
 export const ResultsScreen: React.FC = () => {
     const { currentEvent } = useAppContext();
 
-    const { balances, settlements, totalExpense } = useMemo(() => {
-        if (!currentEvent) return { balances: [], settlements: [], totalExpense: 0 };
+    const { balances, settlements, totalExpense, totalFund, totalSpentFromFund, remainingFund } = useMemo(() => {
+        if (!currentEvent) return { balances: [], settlements: [], totalExpense: 0, totalFund: 0, totalSpentFromFund: 0, remainingFund: 0 };
+        
         const calculatedBalances = calculateBalances(currentEvent);
-        const calculatedSettlements = calculateSettlements(calculatedBalances);
         const totalExp = currentEvent.expenses.reduce((sum, e) => sum + e.amount, 0);
-        return { balances: calculatedBalances, settlements: calculatedSettlements, totalExpense: totalExp };
+        
+        const isFundMode = currentEvent.mode === 'fund';
+        const tFund = isFundMode ? (currentEvent.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
+        const tSpentFromFund = isFundMode ? currentEvent.expenses.reduce((s, e) => {
+            const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
+            return s + (e.amount - membersPaid);
+        }, 0) : 0;
+        const rFund = tFund - tSpentFromFund;
+
+        let balanceList = [...calculatedBalances];
+        if (isFundMode && Math.abs(rFund) > 0.01) {
+            balanceList.push({
+                memberId: 'FUND_BOX',
+                totalPaid: 0,
+                totalShare: 0,
+                balance: -rFund // Inverse: Fund contains money -> Fund owes members -> Negative balance (debtor). 
+            });
+        }
+
+        const calculatedSettlements = calculateSettlements(balanceList);
+        
+        return { 
+            balances: calculatedBalances, // Keep original balances for UI
+            settlements: calculatedSettlements, 
+            totalExpense: totalExp,
+            totalFund: tFund,
+            totalSpentFromFund: tSpentFromFund,
+            remainingFund: rFund
+        };
     }, [currentEvent]);
 
     if (!currentEvent) return null;
+    const isFundMode = currentEvent.mode === 'fund';
 
-    const getMemberName = (id: string) => currentEvent.members.find(m => m.id === id)?.name ?? 'Unknown';
+    const getMemberName = (id: string) => {
+        if (id === 'FUND_BOX') return 'Group Fund';
+        return currentEvent.members.find(m => m.id === id)?.name ?? 'Unknown';
+    };
 
     return (
         <div id="results-container" className="space-y-5">
@@ -54,6 +86,36 @@ export const ResultsScreen: React.FC = () => {
                             <span className="text-[#030609]/70"><span className="font-bold text-[#030609]">{currentEvent.members.length}</span> Members</span>
                         </div>
                     </motion.div>
+
+                    {/* Fund Summary (Only in Fund Mode) */}
+                    {isFundMode && (
+                        <div className="panku-card overflow-hidden">
+                            <div className="px-5 py-4 border-b border-white/[0.04]">
+                                <h3 className="font-bold text-[#E8EDF2]">Fund Summary</h3>
+                            </div>
+                            <div className="p-5 flex flex-col gap-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-[#94A3B8]">Initial Fund</span>
+                                    <span className="font-bold text-[#E8EDF2]">{formatCurrency(totalFund)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-[#94A3B8]">Spent from Fund</span>
+                                    <span className="font-bold text-[#EF4444]">{formatCurrency(totalSpentFromFund)}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                                    <span className="font-bold text-[#E8EDF2]">Remaining Fund</span>
+                                    <span className={`font-black text-lg ${remainingFund >= 0 ? 'text-[#2DD4BF]' : 'text-[#EF4444]'}`}>
+                                        {formatCurrency(remainingFund)}
+                                    </span>
+                                </div>
+                                {remainingFund > 0 && (
+                                    <div className="mt-2 text-[11px] text-[#2DD4BF] bg-[#2DD4BF]/10 p-3 rounded-xl border border-[#2DD4BF]/20 leading-relaxed">
+                                        The remaining <strong>{formatCurrency(remainingFund)}</strong> should be redistributed to members exactly matching their positive balances below.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Member balances */}
                     <div className="panku-card overflow-hidden">
@@ -112,6 +174,9 @@ export const ResultsScreen: React.FC = () => {
                                 {settlements.map((s, idx) => {
                                     const fromName = getMemberName(s.from);
                                     const toName = getMemberName(s.to);
+                                    const isFromFund = s.from === 'FUND_BOX';
+                                    const isToFund = s.to === 'FUND_BOX';
+                                    
                                     return (
                                         <motion.div
                                             key={idx}
@@ -120,13 +185,13 @@ export const ResultsScreen: React.FC = () => {
                                             transition={{ delay: 0.1 + idx * 0.05 }}
                                             className="flex items-center gap-3 px-5 py-4"
                                         >
-                                            <span className={`w-9 h-9 rounded-full ${getAvatarClass(fromName)} text-xs font-bold text-[#030609] flex items-center justify-center shrink-0`}>
-                                                {fromName.charAt(0).toUpperCase()}
+                                            <span className={`w-9 h-9 rounded-full ${isFromFund ? 'bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/20' : getAvatarClass(fromName)} text-xs font-bold text-[#030609] flex items-center justify-center shrink-0`}>
+                                                {isFromFund ? 'FD' : fromName.charAt(0).toUpperCase()}
                                             </span>
                                             <div className="flex-1 flex items-center gap-2 min-w-0">
-                                                <span className="text-[#E8EDF2] font-medium text-sm truncate">{fromName}</span>
+                                                <span className={`font-medium text-sm truncate ${isFromFund ? 'text-[#2DD4BF]' : 'text-[#E8EDF2]'}`}>{fromName}</span>
                                                 <ArrowRight size={14} className="text-[#64748B] shrink-0" />
-                                                <span className="text-[#E8EDF2] font-medium text-sm truncate">{toName}</span>
+                                                <span className={`font-medium text-sm truncate ${isToFund ? 'text-[#2DD4BF]' : 'text-[#E8EDF2]'}`}>{toName}</span>
                                             </div>
                                             <span className="font-extrabold text-[#E8EDF2] text-sm shrink-0">{formatCurrency(s.amount)}</span>
                                         </motion.div>

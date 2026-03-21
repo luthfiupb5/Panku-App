@@ -11,6 +11,7 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [memberInput, setMemberInput] = useState('');
     const [members, setMembers] = useState<string[]>([]);
+    const [mode, setMode] = useState<'normal' | 'fund'>('normal');
 
     const addMember = () => {
         const trimmed = memberInput.trim();
@@ -24,7 +25,7 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         e.preventDefault();
         if (!name.trim()) return;
         const memberObjects = members.map(m => ({ id: crypto.randomUUID(), name: m }));
-        createEvent(name.trim(), date, memberObjects);
+        createEvent(name.trim(), date, memberObjects, mode);
         onClose();
     };
 
@@ -118,6 +119,33 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Event Mode */}
+                        <div>
+                            <label className="block text-xs font-semibold text-[#9AA4AF] uppercase tracking-wider mb-3">Expense Mode</label>
+                            
+                            <div className="space-y-3">
+                                <label className={`flex items-start gap-3 p-3 rounded-[14px] border ${mode === 'normal' ? 'border-[#2DD4BF] bg-[#2DD4BF]/10' : 'border-white/10 opacity-70'} cursor-pointer transition-all`}>
+                                    <div className="pt-1">
+                                        <input type="radio" name="mode" value="normal" checked={mode === 'normal'} onChange={() => setMode('normal')} className="accent-[#2DD4BF] w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <p className={`font-bold text-sm ${mode === 'normal' ? 'text-[#2DD4BF]' : 'text-[#E8EDF2]'}`}>Split Expenses Normally</p>
+                                        <p className="text-xs text-[#9AA4AF] mt-0.5">Current system. Add expenses and select who paid.</p>
+                                    </div>
+                                </label>
+
+                                <label className={`flex items-start gap-3 p-3 rounded-[14px] border ${mode === 'fund' ? 'border-[#2DD4BF] bg-[#2DD4BF]/10' : 'border-white/10 opacity-70'} cursor-pointer transition-all`}>
+                                    <div className="pt-1">
+                                        <input type="radio" name="mode" value="fund" checked={mode === 'fund'} onChange={() => setMode('fund')} className="accent-[#2DD4BF] w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <p className={`font-bold text-sm ${mode === 'fund' ? 'text-[#2DD4BF]' : 'text-[#E8EDF2]'}`}>Use Group Fund <span className="opacity-70">(Initial Deposit)</span></p>
+                                        <p className="text-xs text-[#9AA4AF] mt-0.5">Everyone contributes money to a common fund. Expenses are paid from that fund.</p>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
 
                         <button type="submit" className="btn-teal w-full py-4 text-base font-bold">

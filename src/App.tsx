@@ -7,17 +7,11 @@ import { ExpensesScreen } from './screens/ExpensesScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { ReportScreen } from './screens/ReportScreen';
 import { InstallPrompt } from './components/InstallPrompt';
-import { Home, Receipt, PieChart, BarChart3 } from 'lucide-react';
+import { FundDepositsScreen } from './screens/FundDepositsScreen';
+import { Home, Receipt, PieChart, BarChart3, Wallet } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type Tab = 'home' | 'expenses' | 'summary' | 'report';
-
-const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: 'home',     label: 'Home',     icon: <Home size={20} /> },
-    { id: 'expenses', label: 'Expenses', icon: <Receipt size={20} /> },
-    { id: 'summary',  label: 'Summary',  icon: <PieChart size={20} /> },
-    { id: 'report',   label: 'Report',   icon: <BarChart3 size={20} /> },
-];
+type Tab = 'home' | 'fund' | 'expenses' | 'summary' | 'report';
 
 const AppContent: React.FC = () => {
     const { currentEvent } = useAppContext();
@@ -31,6 +25,20 @@ const AppContent: React.FC = () => {
             </div>
         );
     }
+
+    const isFundMode = currentEvent.mode === 'fund';
+    const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = isFundMode ? [
+        { id: 'home',     label: 'Home',     icon: <Home size={20} /> },
+        { id: 'fund',     label: 'Deposits', icon: <Wallet size={20} /> },
+        { id: 'expenses', label: 'Expenses', icon: <Receipt size={20} /> },
+        { id: 'summary',  label: 'Summary',  icon: <PieChart size={20} /> },
+        { id: 'report',   label: 'Report',   icon: <BarChart3 size={20} /> },
+    ] : [
+        { id: 'home',     label: 'Home',     icon: <Home size={20} /> },
+        { id: 'expenses', label: 'Expenses', icon: <Receipt size={20} /> },
+        { id: 'summary',  label: 'Summary',  icon: <PieChart size={20} /> },
+        { id: 'report',   label: 'Report',   icon: <BarChart3 size={20} /> },
+    ];
 
     return (
         <div className="min-h-screen bg-transparent flex flex-col">
@@ -47,6 +55,7 @@ const AppContent: React.FC = () => {
                         transition={{ duration: 0.18, ease: 'easeOut' }}
                     >
                         {activeTab === 'home'     && <DashboardScreen />}
+                        {activeTab === 'fund'     && <FundDepositsScreen />}
                         {activeTab === 'expenses' && <ExpensesScreen />}
                         {activeTab === 'summary'  && <ResultsScreen />}
                         {activeTab === 'report'   && <ReportScreen />}

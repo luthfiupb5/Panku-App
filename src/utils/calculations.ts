@@ -12,6 +12,15 @@ export const calculateBalances = (event: SplitterEvent): MemberBalance[] => {
         };
     });
 
+    if (event.mode === 'fund') {
+        const deposits = event.fundDeposits || [];
+        deposits.forEach(deposit => {
+            if (balances[deposit.memberId]) {
+                balances[deposit.memberId].totalPaid += deposit.amount;
+            }
+        });
+    }
+
     event.expenses.forEach(expense => {
         // Add totalPaid
         expense.paidBy.forEach(payment => {
