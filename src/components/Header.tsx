@@ -20,14 +20,14 @@ export const Header: React.FC = () => {
                 {currentEvent ? (
                     <button
                         onClick={() => setActiveEvent(null)}
-                        className="flex items-center gap-1.5 text-[#9AA4AF] hover:text-[#9BE15D] transition-colors group"
+                        className="flex items-center gap-1.5 text-[#9AA4AF] hover:text-[#2DD4BF] transition-colors group"
                     >
                         <ChevronLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
                         <span className="text-sm font-medium">Events</span>
                     </button>
                 ) : (
                     <div className="flex items-center">
-                        <img src={logoDarkBg} alt="Panku Logo" className="h-8 object-contain drop-shadow-[0_0_8px_rgba(28,232,183,0.3)]" />
+                        <img src={logoDarkBg} alt="Panku Logo" className="h-8 object-contain drop-shadow-[0_0_8px_rgba(45,212,191,0.3)]" />
                     </div>
                 )}
 
@@ -39,7 +39,7 @@ export const Header: React.FC = () => {
                         className="flex items-center gap-2 panku-card-inner px-3 py-1.5 max-w-[50%]"
                         style={{ borderRadius: '10px' }}
                     >
-                        <CalendarDays size={12} className="text-[#9BE15D] shrink-0" />
+                        <CalendarDays size={12} className="text-[#2DD4BF] shrink-0" />
                         <div className="min-w-0">
                             <p className="font-semibold text-[#E8EDF2] text-xs truncate">{currentEvent.name}</p>
                             <p className="text-[10px] text-[#66707A]">{new Date(currentEvent.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>

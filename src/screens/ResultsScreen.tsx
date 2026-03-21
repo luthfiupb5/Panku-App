@@ -1,97 +1,38 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { calculateBalances, calculateSettlements, formatCurrency } from '../utils/calculations';
-import { generatePDF } from '../utils/pdfExport';
-import {
-    PieChart, Pie, Cell,
-    BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend
-} from 'recharts';
-import { Download, ArrowRight, CheckCircle2, TrendingUp, BarChart3, PartyPopper } from 'lucide-react';
+import { ArrowRight, TrendingUp, BarChart3, PartyPopper } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const AVATAR = ['avatar-0','avatar-1','avatar-2','avatar-3','avatar-4','avatar-5','avatar-6','avatar-7'];
 const getAvatarClass = (name: string) => AVATAR[name.charCodeAt(0) % AVATAR.length];
 
-// Chart colors - green palette
-const CHART_COLORS = ['#9BE15D', '#00E3AE', '#6EF38D', '#2ED573', '#FFA502', '#FF6B9D', '#a78bfa', '#38bdf8'];
-
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="panku-card px-3 py-2.5 text-xs">
-                {label && <p className="text-[#9AA4AF] mb-1 font-medium">{label}</p>}
-                {payload.map((p) => (
-                    <p key={p.name} style={{ color: p.color }} className="font-bold">
-                        {p.name}: {formatCurrency(p.value)}
-                    </p>
-                ))}
-            </div>
-        );
-    }
-    return null;
-};
-
 export const ResultsScreen: React.FC = () => {
     const { currentEvent } = useAppContext();
-    const [isExporting, setIsExporting] = useState(false);
-    const [exportSuccess, setExportSuccess] = useState(false);
 
-    const { balances, settlements, totalExpense, chartsData } = useMemo(() => {
-        if (!currentEvent) return { balances: [], settlements: [], totalExpense: 0, chartsData: null };
+    const { balances, settlements, totalExpense } = useMemo(() => {
+        if (!currentEvent) return { balances: [], settlements: [], totalExpense: 0 };
         const calculatedBalances = calculateBalances(currentEvent);
         const calculatedSettlements = calculateSettlements(calculatedBalances);
         const totalExp = currentEvent.expenses.reduce((sum, e) => sum + e.amount, 0);
-        const pieData = currentEvent.expenses.map(e => ({ name: e.title, value: e.amount }));
-        const barData = calculatedBalances.map(b => ({
-            name: currentEvent.members.find(m => m.id === b.memberId)?.name ?? 'Unknown',
-            Paid: b.totalPaid,
-            Share: b.totalShare
-        }));
-        return { balances: calculatedBalances, settlements: calculatedSettlements, totalExpense: totalExp, chartsData: { pieData, barData } };
+        return { balances: calculatedBalances, settlements: calculatedSettlements, totalExpense: totalExp };
     }, [currentEvent]);
 
     if (!currentEvent) return null;
 
     const getMemberName = (id: string) => currentEvent.members.find(m => m.id === id)?.name ?? 'Unknown';
 
-    const handleExport = async () => {
-        setIsExporting(true);
-        try {
-            await generatePDF(currentEvent);
-            setExportSuccess(true);
-            setTimeout(() => setExportSuccess(false), 2500);
-        } catch (e) {
-            console.error('Export failed:', e);
-        } finally {
-            setIsExporting(false);
-        }
-    };
-
     return (
-        <div id="report-container">
+        <div id="results-container" className="space-y-5">
             {/* Page header */}
-            <div className="mb-5 flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-extrabold text-[#E8EDF2]">Summary</h2>
-                    <p className="text-[#9AA4AF] text-sm mt-0.5">Final breakdown & settlements.</p>
-                </div>
-                <button
-                    onClick={handleExport}
-                    disabled={isExporting || currentEvent.expenses.length === 0}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-95 ${
-                        exportSuccess
-                            ? 'bg-[#2ED573]/20 text-[#2ED573] border border-[#2ED573]/40'
-                            : 'btn-green disabled:opacity-40 disabled:cursor-not-allowed'
-                    }`}
-                >
-                    {exportSuccess ? <CheckCircle2 size={16} /> : <Download size={16} />}
-                    {exportSuccess ? 'Downloaded!' : isExporting ? 'Exporting...' : 'Export PDF'}
-                </button>
+            <div className="mb-2">
+                <h2 className="text-2xl font-extrabold text-[#E8EDF2]">Summary</h2>
+                <p className="text-[#9AA4AF] text-sm mt-0.5">Final breakdown & settlements.</p>
             </div>
 
             {currentEvent.expenses.length === 0 ? (
                 <div className="panku-card py-16 text-center border-dashed border-2 border-white/10 bg-transparent shadow-none">
-                    <div className="w-16 h-16 mx-auto rounded-full bg-white/5 flex items-center justify-center text-[#1CE8B7] mb-4 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-white/5 flex items-center justify-center text-[#2DD4BF] mb-4 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                         <BarChart3 size={28} strokeWidth={1.5} />
                     </div>
                     <p className="text-[#F8FAFC] font-bold text-lg mb-1">No expenses to summarize</p>
@@ -103,8 +44,7 @@ export const ResultsScreen: React.FC = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="relative rounded-[24px] p-6 overflow-hidden shadow-[0_8px_32px_rgba(28,232,183,0.25)] border border-white/20"
-                        style={{ background: 'linear-gradient(135deg, #A8F06E 0%, #1CE8B7 100%)' }}
+                        className="relative rounded-[24px] p-6 overflow-hidden shadow-[0_8px_32px_rgba(45,212,191,0.25)] border border-white/20 bg-teal-gradient"
                     >
                         <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/30 rounded-full blur-2xl mix-blend-overlay" />
                         <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Expense</p>
@@ -118,7 +58,7 @@ export const ResultsScreen: React.FC = () => {
                     {/* Member balances */}
                     <div className="panku-card overflow-hidden">
                         <div className="px-5 py-4 border-b border-white/[0.04] flex items-center gap-2">
-                            <TrendingUp size={16} className="text-[#9BE15D]" />
+                            <TrendingUp size={16} className="text-[#2DD4BF]" />
                             <h3 className="font-bold text-[#E8EDF2]">Member Balances</h3>
                         </div>
                         <div className="divide-y divide-white/[0.04]">
@@ -135,8 +75,8 @@ export const ResultsScreen: React.FC = () => {
                                         className="flex items-center gap-4 px-5 py-4"
                                     >
                                         {/* Avatar */}
-                                        <div className={`w-10 h-10 rounded-full ${getAvatarClass(name)} flex items-center justify-center font-bold text-[#0B0F14] text-sm shrink-0`}
-                                            style={{ boxShadow: `0 0 0 2px #141A21, 0 0 0 3px ${isPositive ? 'rgba(46,213,115,0.4)' : 'rgba(255,71,87,0.4)'}` }}
+                                        <div className={`w-10 h-10 rounded-full ${getAvatarClass(name)} flex items-center justify-center font-bold text-[#030609] text-sm shrink-0`}
+                                            style={{ boxShadow: `0 0 0 2px #141A21, 0 0 0 3px ${isPositive ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}` }}
                                         >
                                             {name.charAt(0).toUpperCase()}
                                         </div>
@@ -150,7 +90,7 @@ export const ResultsScreen: React.FC = () => {
                                         </div>
                                         {/* Balance */}
                                         <div
-                                            className={`px-3 py-1.5 rounded-xl text-sm font-black ${isPositive ? 'glow-green bg-[#2ED573]/10 text-[#2ED573]' : 'glow-red bg-[#FF4757]/10 text-[#FF4757]'}`}
+                                            className={`px-3 py-1.5 rounded-xl text-sm font-black ${isPositive ? 'glow-teal bg-[#10B981]/10 text-[#10B981]' : 'glow-red bg-[#EF4444]/10 text-[#EF4444]'}`}
                                         >
                                             {isPositive ? '+' : ''}{formatCurrency(balance)}
                                         </div>
@@ -164,7 +104,7 @@ export const ResultsScreen: React.FC = () => {
                     {settlements.length > 0 && (
                         <div className="panku-card overflow-hidden">
                             <div className="px-5 py-4 border-b border-white/[0.04] flex items-center gap-2">
-                                <ArrowRight size={16} className="text-[#9BE15D]" />
+                                <ArrowRight size={16} className="text-[#2DD4BF]" />
                                 <h3 className="font-bold text-[#E8EDF2]">Settlements</h3>
                                 <span className="text-xs text-[#66707A] ml-auto">Who pays whom</span>
                             </div>
@@ -180,12 +120,12 @@ export const ResultsScreen: React.FC = () => {
                                             transition={{ delay: 0.1 + idx * 0.05 }}
                                             className="flex items-center gap-3 px-5 py-4"
                                         >
-                                            <span className={`w-9 h-9 rounded-full ${getAvatarClass(fromName)} text-xs font-bold text-[#0B0F14] flex items-center justify-center shrink-0`}>
+                                            <span className={`w-9 h-9 rounded-full ${getAvatarClass(fromName)} text-xs font-bold text-[#030609] flex items-center justify-center shrink-0`}>
                                                 {fromName.charAt(0).toUpperCase()}
                                             </span>
                                             <div className="flex-1 flex items-center gap-2 min-w-0">
                                                 <span className="text-[#E8EDF2] font-medium text-sm truncate">{fromName}</span>
-                                                <ArrowRight size={14} className="text-[#9BE15D] shrink-0" />
+                                                <ArrowRight size={14} className="text-[#64748B] shrink-0" />
                                                 <span className="text-[#E8EDF2] font-medium text-sm truncate">{toName}</span>
                                             </div>
                                             <span className="font-extrabold text-[#E8EDF2] text-sm shrink-0">{formatCurrency(s.amount)}</span>
@@ -198,52 +138,11 @@ export const ResultsScreen: React.FC = () => {
 
                     {settlements.length === 0 && balances.length > 0 && (
                         <div className="panku-card p-6 text-center border-dashed border-2 border-white/10 bg-transparent shadow-none hover:border-white/20">
-                            <div className="w-16 h-16 mx-auto rounded-full bg-[#1CE8B7]/10 flex items-center justify-center text-[#1CE8B7] mb-4 border border-[#1CE8B7]/20 shadow-[0_0_20px_rgba(28,232,183,0.15)]">
+                            <div className="w-16 h-16 mx-auto rounded-full bg-[#2DD4BF]/10 flex items-center justify-center text-[#2DD4BF] mb-4 border border-[#2DD4BF]/20 shadow-[0_0_20px_rgba(45,212,191,0.15)]">
                                 <PartyPopper size={28} strokeWidth={1.5} />
                             </div>
-                            <p className="text-[#1CE8B7] font-bold text-lg mb-1">All balances are settled!</p>
+                            <p className="text-[#2DD4BF] font-bold text-lg mb-1">All balances are settled!</p>
                             <p className="text-[#94A3B8] text-sm">No payments needed.</p>
-                        </div>
-                    )}
-
-                    {/* Charts */}
-                    {chartsData && chartsData.pieData.length > 0 && (
-                        <div className="space-y-4">
-                            {/* Pie chart */}
-                            <div className="panku-card p-5">
-                                <h3 className="font-bold text-[#E8EDF2] mb-4 flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-green-gradient inline-block" />
-                                    Expense Distribution
-                                </h3>
-                                <ResponsiveContainer width="100%" height={200}>
-                                    <PieChart>
-                                        <Pie data={chartsData.pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
-                                            {chartsData.pieData.map((_, i) => (
-                                                <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip content={<CustomTooltip />} />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            {/* Bar chart */}
-                            <div className="panku-card p-5">
-                                <h3 className="font-bold text-[#E8EDF2] mb-4 flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-green-gradient inline-block" />
-                                    Paid vs Share
-                                </h3>
-                                <ResponsiveContainer width="100%" height={220}>
-                                    <BarChart data={chartsData.barData} barCategoryGap="30%">
-                                        <XAxis dataKey="name" tick={{ fill: '#9AA4AF', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                        <YAxis tick={{ fill: '#66707A', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v}`} />
-                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                                        <Legend wrapperStyle={{ color: '#9AA4AF', fontSize: 12 }} />
-                                        <Bar dataKey="Paid" fill="#9BE15D" radius={[6, 6, 0, 0]} />
-                                        <Bar dataKey="Share" fill="#00E3AE" radius={[6, 6, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
                         </div>
                     )}
                 </div>

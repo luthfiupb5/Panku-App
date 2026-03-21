@@ -18,7 +18,7 @@ export const generatePDF = async (event: SplitterEvent) => {
         // Custom Colors
         const primaryText = '#0B0F14';
         const secondaryText = '#66707A';
-        const accent = '#1CE8B7'; // Brand Green
+        const accent = '#2DD4BF'; // Brand Teal
 
         // Helper function for adding text
         const addText = (text: string, x: number, y: number, size: number, color: string, isBold: boolean = false, align: 'left' | 'center' | 'right' = 'left') => {
@@ -125,12 +125,27 @@ export const generatePDF = async (event: SplitterEvent) => {
             const name = getMemberName(b.memberId);
             const balanceText = formatForPDF(Math.abs(b.balance));
             const isPositive = b.balance >= 0;
-            const balanceColor = isPositive ? '#2ED573' : '#FF4757';
+            const balanceColor = isPositive ? '#10B981' : '#EF4444';
             const sign = isPositive ? '+' : '-';
 
             addText(name, margin, currentY, 11, primaryText, true);
             addText(`Paid: ${formatForPDF(b.totalPaid)}  |  Share: ${formatForPDF(b.totalShare)}`, margin, currentY + 5, 9, secondaryText);
-            addText(`${sign}${balanceText}`, pageWidth - margin, currentY, 11, balanceColor, true, 'right');
+            
+            // Draw a pill background for the balance
+            const fullBalanceText = `${sign}${balanceText}`;
+            pdf.setFontSize(11);
+            pdf.setFont('helvetica', 'bold');
+            const bTextW = pdf.getStringUnitWidth(fullBalanceText) * 11 / pdf.internal.scaleFactor;
+            const bPillW = bTextW + 8;
+            const bPillH = 7;
+            const bPillX = pageWidth - margin - bPillW;
+            const bPillY = currentY - 5;
+            
+            // Approximate light background colors for positive/negative
+            pdf.setFillColor(isPositive ? '#E6F8EF' : '#FDECEE');
+            pdf.roundedRect(bPillX, bPillY, bPillW, bPillH, 1.5, 1.5, 'F');
+            
+            addText(fullBalanceText, pageWidth - margin - 4, currentY, 11, balanceColor, true, 'right');
             
             currentY += 14;
 
@@ -159,12 +174,28 @@ export const generatePDF = async (event: SplitterEvent) => {
                 const toName = getMemberName(s.to);
                 
                 // Get width of name in mm to calculate X position
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'bold');
                 const fromWidth = pdf.getStringUnitWidth(fromName) * 11 / pdf.internal.scaleFactor;
-                const arrowWidth = pdf.getStringUnitWidth(' -> ') * 11 / pdf.internal.scaleFactor;
                 
                 addText(fromName, margin, currentY, 11, primaryText, true);
-                addText(' -> ', margin + fromWidth, currentY, 11, secondaryText);
-                addText(toName, margin + fromWidth + arrowWidth, currentY, 11, primaryText, true);
+                
+                // Draw a nice "PAYS" badge instead of an arrow
+                const badgeText = "PAYS";
+                pdf.setFontSize(7);
+                pdf.setFont('helvetica', 'bold');
+                const badgeTextWidth = pdf.getStringUnitWidth(badgeText) * 7 / pdf.internal.scaleFactor;
+                const badgeWidth = badgeTextWidth + 4;
+                const badgeHeight = 4.5;
+                const badgeX = margin + fromWidth + 3;
+                const badgeY = currentY - 3;
+                
+                pdf.setFillColor(accent); // Teal background
+                pdf.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 1, 1, 'F');
+                addText(badgeText, badgeX + 2, currentY + 0.3, 7, '#FFFFFF', true);
+                
+                const toNameX = badgeX + badgeWidth + 3;
+                addText(toName, toNameX, currentY, 11, primaryText, true);
                 
                 addText(formatForPDF(s.amount), pageWidth - margin, currentY, 12, primaryText, true, 'right');
                 

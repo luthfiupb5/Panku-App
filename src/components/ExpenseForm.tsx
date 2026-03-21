@@ -70,7 +70,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
 
     return (
         <div className="panku-card overflow-hidden relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-green-gradient" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-teal-gradient" />
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.04]">
@@ -102,7 +102,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                         min="0.01"
                         step="0.01"
                         placeholder="0.00"
-                        className="panku-input font-black text-2xl text-green-gradient"
+                        className="panku-input font-black text-2xl text-teal-gradient"
                         value={amount}
                         onChange={e => setAmount(e.target.value)}
                     />
@@ -117,7 +117,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                             <button
                                 type="button"
                                 onClick={() => setIsMultiPayer(!isMultiPayer)}
-                                className={`w-10 h-5 rounded-full transition-all relative ${isMultiPayer ? 'bg-green-gradient' : 'bg-[#66707A]/40'}`}
+                                className={`w-10 h-5 rounded-full transition-all relative ${isMultiPayer ? 'bg-teal-gradient' : 'bg-[#66707A]/40'}`}
                             >
                                 <div className={`absolute top-0.5 bg-white w-4 h-4 rounded-full shadow transition-transform ${isMultiPayer ? 'left-5' : 'left-0.5'}`} />
                             </button>
@@ -176,7 +176,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                                 if (participants.size === currentEvent.members.length) setParticipants(new Set());
                                 else setParticipants(new Set(currentEvent.members.map(m => m.id)));
                             }}
-                            className="text-xs text-[#9BE15D] font-semibold bg-[#9BE15D]/10 hover:bg-[#9BE15D]/20 px-2.5 py-1 rounded-lg transition-colors"
+                            className="text-xs text-[#2DD4BF] font-semibold bg-[#2DD4BF]/10 hover:bg-[#2DD4BF]/20 px-2.5 py-1 rounded-lg transition-colors"
                         >
                             {participants.size === currentEvent.members.length ? 'Deselect All' : 'Select All'}
                         </button>
@@ -191,11 +191,11 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                                     onClick={() => toggleParticipant(m.id)}
                                     className={`flex items-center gap-2 px-3 py-2 rounded-[14px] text-sm font-medium transition-all active:scale-95 border ${
                                         sel
-                                            ? 'bg-gradient-to-br from-[#1CE8B7]/20 to-[#A8F06E]/10 border-[#1CE8B7]/40 text-[#1CE8B7] shadow-[0_4px_12px_rgba(28,232,183,0.15)]'
+                                            ? 'bg-gradient-to-br from-[#2DD4BF]/20 to-[#14B8A6]/10 border-[#2DD4BF]/40 text-[#2DD4BF] shadow-[0_4px_12px_rgba(45,212,191,0.15)]'
                                             : 'panku-card-inner border-white/5 text-[#94A3B8] hover:border-white/15'
                                     }`}
                                 >
-                                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold ${sel ? `bg-green-gradient text-[#030609]` : 'bg-white/10 text-[#64748B]'}`}>
+                                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold ${sel ? `bg-teal-gradient text-[#030609]` : 'bg-white/10 text-[#64748B]'}`}>
                                         {sel ? <Check size={12} strokeWidth={3} /> : m.name.charAt(0).toUpperCase()}
                                     </span>
                                     {m.name}
@@ -205,7 +205,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                     </div>
                 </div>
 
-                <button type="submit" className="w-full btn-green font-bold py-4 text-base flex justify-center items-center gap-2">
+                <button type="submit" className="w-full btn-teal font-bold py-4 text-base flex justify-center items-center gap-2">
                     <Check size={20} />
                     <span>Save Expense</span>
                 </button>

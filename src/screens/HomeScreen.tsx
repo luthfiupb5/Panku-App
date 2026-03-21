@@ -45,8 +45,8 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 className="w-full max-w-md panku-card overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                {/* Green top bar */}
-                <div className="h-1 w-full bg-green-gradient" />
+                {/* Teal top bar */}
+                <div className="h-1 w-full bg-teal-gradient" />
 
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
@@ -90,13 +90,13 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     onChange={e => setMemberInput(e.target.value)}
                                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } }}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={addMember}
-                                    className="w-11 h-11 rounded-xl flex items-center justify-center btn-green text-[#0B0F14] font-bold shrink-0"
-                                >
-                                    <Plus size={20} />
-                                </button>
+                                    <button
+                                        type="button"
+                                        onClick={addMember}
+                                        className="w-11 h-11 rounded-xl flex items-center justify-center btn-teal text-[#030609] font-bold shrink-0"
+                                    >
+                                        <Plus size={20} />
+                                    </button>
                             </div>
                             {/* Member chips */}
                             {members.length > 0 && (
@@ -104,13 +104,13 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     {members.map(m => (
                                         <span
                                             key={m}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-[#0B0F14] bg-green-gradient"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-[#030609] bg-teal-gradient"
                                         >
                                             {m}
                                             <button
                                                 type="button"
                                                 onClick={() => setMembers(prev => prev.filter(x => x !== m))}
-                                                className="text-[#0B0F14]/60 hover:text-[#0B0F14] transition-colors"
+                                                className="text-[#030609]/60 hover:text-[#030609] transition-colors"
                                             >
                                                 <X size={12} />
                                             </button>
@@ -120,7 +120,7 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                             )}
                         </div>
 
-                        <button type="submit" className="btn-green w-full py-4 text-base font-bold">
+                        <button type="submit" className="btn-teal w-full py-4 text-base font-bold">
                             Create Event
                         </button>
                     </form>
@@ -142,13 +142,13 @@ export const HomeScreen: React.FC = () => {
             {/* Header */}
             <div className="px-5 pt-8 pb-4">
                 <div className="flex items-center gap-2.5 mb-6">
-                    <img src={logoDarkBg} alt="Panku Logo" className="h-10 object-contain drop-shadow-[0_0_20px_rgba(28,232,183,0.3)]" />
+                    <img src={logoDarkBg} alt="Panku Logo" className="h-10 object-contain drop-shadow-[0_0_20px_rgba(45,212,191,0.3)]" />
                 </div>
 
                 <p className="text-xs font-semibold text-[#9AA4AF] uppercase tracking-widest mb-1">Welcome back</p>
                 <h1 className="text-3xl font-extrabold text-[#E8EDF2] leading-tight">
                     Split expenses,<br />
-                    <span className="text-green-gradient">stay friends.</span>
+                    <span className="text-teal-gradient">stay friends.</span>
                 </h1>
             </div>
 
@@ -160,14 +160,14 @@ export const HomeScreen: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex-1 flex flex-col items-center justify-center text-center -mt-20"
                     >
-                        <div className="mb-6 drop-shadow-[0_20px_40px_rgba(28,232,183,0.3)] animate-float text-[#1CE8B7]">
+                        <div className="mb-6 drop-shadow-[0_20px_40px_rgba(45,212,191,0.3)] animate-float text-[#2DD4BF]">
                             <Receipt size={100} strokeWidth={1} />
                         </div>
                         <h2 className="text-[#F8FAFC] font-black text-3xl mb-3 tracking-tight">No events yet</h2>
                         <p className="text-[#94A3B8] text-base mb-10 max-w-[240px]">Create an event to start splitting expenses with friends.</p>
                         <button 
                             onClick={() => setShowCreate(true)}
-                            className="btn-green px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 shadow-[0_10px_30px_rgba(28,232,183,0.4)]"
+                            className="btn-teal px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 shadow-[0_10px_30px_rgba(45,212,191,0.4)]"
                         >
                             <Plus size={24} strokeWidth={3} />
                             Create First Event
@@ -196,7 +196,7 @@ export const HomeScreen: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); if (window.confirm(`Delete "${event.name}"?`)) deleteEvent(event.id); }}
-                                            className="text-[#66707A] hover:text-[#FF4757] p-2 rounded-xl hover:bg-[#FF4757]/10 transition-all opacity-0 group-hover:opacity-100"
+                                            className="text-[#66707A] hover:text-[#FF4757] p-2 rounded-xl hover:bg-[#FF4757]/10 transition-all bg-white/5"
                                         >
                                             <Trash2 size={16} />
                                         </button>
@@ -205,11 +205,11 @@ export const HomeScreen: React.FC = () => {
                                     {/* Stats row */}
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className="flex items-center gap-1.5 text-[#9AA4AF] text-sm">
-                                            <Users size={14} className="text-[#9BE15D]" />
+                                            <Users size={14} className="text-[#2DD4BF]" />
                                             <span>{event.members.length} Members</span>
                                         </div>
                                         <div className="flex items-center gap-1.5 text-[#9AA4AF] text-sm">
-                                            <Receipt size={14} className="text-[#9BE15D]" />
+                                            <Receipt size={14} className="text-[#2DD4BF]" />
                                             <span>{event.expenses.length} Expenses</span>
                                         </div>
                                     </div>
@@ -222,7 +222,7 @@ export const HomeScreen: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={() => setActiveEvent(event.id)}
-                                            className="flex items-center gap-2 text-[#9BE15D] font-semibold text-sm bg-[#9BE15D]/10 hover:bg-[#9BE15D]/20 px-4 py-2 rounded-xl transition-all active:scale-95"
+                                            className="flex items-center gap-2 text-[#2DD4BF] font-semibold text-sm bg-[#2DD4BF]/10 hover:bg-[#2DD4BF]/20 px-4 py-2 rounded-xl transition-all active:scale-95"
                                         >
                                             View Details
                                             <ArrowRight size={14} />
@@ -241,7 +241,7 @@ export const HomeScreen: React.FC = () => {
                     whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.94 }}
                     onClick={() => setShowCreate(true)}
-                    className="fab-green fixed bottom-8 right-6 z-40"
+                    className="fab-teal fixed bottom-8 right-6 z-40"
                     title="Create Event"
                 >
                     <Plus size={26} strokeWidth={2.5} />
