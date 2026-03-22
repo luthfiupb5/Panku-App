@@ -10,6 +10,7 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { FundDepositsScreen } from './screens/FundDepositsScreen';
 import { Home, Receipt, PieChart, BarChart3, Wallet } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 
 type Tab = 'home' | 'fund' | 'expenses' | 'summary' | 'report';
 
@@ -122,6 +123,7 @@ export const App: React.FC = () => (
         </div>
         <AppContent />
         <InstallPrompt />
+        <Analytics />
     </AppProvider>
 );
 
