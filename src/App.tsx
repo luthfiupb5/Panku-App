@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { Header } from './components/Header';
 import { HomeScreen } from './screens/HomeScreen';
@@ -122,6 +123,7 @@ export const App: React.FC = () => (
         </div>
         <AppContent />
         <InstallPrompt />
+        <Analytics />
     </AppProvider>
 );
 
