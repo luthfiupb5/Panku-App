@@ -65,38 +65,6 @@ All your data stays **only on your device**. Panku does **not use any backend or
 
 ---
 
-## 💻 Local Development
-
-Want to run Panku locally or contribute? It's easy!
-
-### Prerequisites
-- Node.js (v18 or higher)
-- npm or pnpm
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/panku.git
-   cd panku
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Build for production:**
-   ```bash
-   npm run build
-   ```
-
----
 
 ## 🎯 Why Panku?
 
