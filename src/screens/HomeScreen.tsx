@@ -166,7 +166,7 @@ export const HomeScreen: React.FC = () => {
         event.expenses.reduce((sum, e) => sum + e.amount, 0);
 
     return (
-        <div className="relative min-h-screen flex flex-col pb-8">
+        <div className="relative min-h-[100dvh] w-full overflow-x-hidden flex flex-col pb-8">
             {/* Header */}
             <div className="px-5 pt-8 pb-4">
                 <div className="flex items-center gap-2.5 mb-6">

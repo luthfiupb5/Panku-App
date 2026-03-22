@@ -20,7 +20,7 @@ const AppContent: React.FC = () => {
     // No active event → show the Home screen
     if (!currentEvent) {
         return (
-            <div className="min-h-screen bg-transparent">
+            <div className="min-h-[100dvh] w-full overflow-x-hidden bg-transparent">
                 <HomeScreen />
             </div>
         );
@@ -41,7 +41,7 @@ const AppContent: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-transparent flex flex-col">
+        <div className="min-h-[100dvh] w-full overflow-x-hidden bg-transparent flex flex-col">
             <Header />
 
             {/* Main content */}
