@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/Assets/logo-lightbg.png" alt="Panku App" width="200" />
+  <img src="public/Assets/logo-darkbg.png" alt="Panku App" width="200" />
   <h1>🟢 Panku (പങ്ക്)</h1>
   <p><em>"Share" — Split expenses. Stay friends.</em></p>
   
@@ -92,7 +92,7 @@ Unlike traditional expense apps, Panku requires absolutely **zero setup friction
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/panku/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/luthfiupb5/Panku-App/issues).
 
 1. Fork the project.
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
