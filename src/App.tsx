@@ -66,7 +66,7 @@ const AppContent: React.FC = () => {
             {/* Floating pill navigation */}
             <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 px-4 pointer-events-none">
                 <nav
-                    className="pointer-events-auto flex items-center gap-1 p-2 rounded-2xl"
+                    className="pointer-events-auto flex items-center justify-between sm:justify-center gap-1 sm:gap-2 p-2 rounded-2xl w-full max-w-sm mx-auto"
                     style={{
                         background: 'rgba(10, 28, 40, 0.75)',
                         backdropFilter: 'blur(32px)',
@@ -80,7 +80,7 @@ const AppContent: React.FC = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className="relative flex flex-col items-center justify-center px-6 py-2.5 rounded-xl focus:outline-none transition-all"
+                                className="relative flex-1 sm:flex-none flex flex-col items-center justify-center px-1 sm:px-6 py-2.5 rounded-xl focus:outline-none transition-all"
                             >
                                 {isActive && (
                                     <motion.div

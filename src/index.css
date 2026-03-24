@@ -64,7 +64,6 @@
     width: 100%;
     overflow-x: hidden;
     min-height: 100dvh;
-    overscroll-behavior-y: none;
   }
   input, textarea, select {
     -webkit-user-select: auto;

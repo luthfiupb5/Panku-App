@@ -78,7 +78,7 @@ export const ReportScreen: React.FC = () => {
                             <PieIcon size={18} className="text-[#2DD4BF]" />
                             <h3 className="font-bold text-sm uppercase tracking-wider text-[#8FA9B2]">Expense Distribution</h3>
                         </div>
-                        <div className="h-[220px] w-full">
+                        <div className="h-[220px] w-full touch-pan-y">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -109,7 +109,7 @@ export const ReportScreen: React.FC = () => {
                             <TrendingUp size={18} className="text-[#2DD4BF]" />
                             <h3 className="font-bold text-sm uppercase tracking-wider text-[#8FA9B2]">Payments by Member</h3>
                         </div>
-                        <div className="h-[250px] w-full">
+                        <div className="h-[250px] w-full touch-pan-y">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartsData?.barData}>
                                     <XAxis dataKey="name" stroke="#5C7280" fontSize={10} axisLine={false} tickLine={false} />
