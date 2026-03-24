@@ -16,6 +16,17 @@
 
 Whether it’s a trip, outing, or casual meetup, Panku ensures everyone pays their fair share — **without complexity, without accounts, and without storing your data anywhere**.
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="public/Screenshots/dashboard.jpeg" width="22%" />
+  <img src="public/Screenshots/expenses.jpeg" width="22%" />
+  <img src="public/Screenshots/summary.jpeg" width="22%" />
+  <img src="public/Screenshots/report.jpeg" width="22%" />
+</div>
+
+---
+
 ## ✨ Features
 
 - **🧾 Expense Tracking:** Add expenses one by one. Track who paid and who participated (supports partial participation).

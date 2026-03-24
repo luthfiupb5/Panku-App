@@ -27,6 +27,32 @@ export default defineConfig({
         scope: '/',
         orientation: 'portrait',
         categories: ['finance', 'utilities'],
+        screenshots: [
+          {
+            src: 'Screenshots/dashboard.jpeg',
+            sizes: '1080x2340',
+            type: 'image/jpeg',
+            form_factor: 'narrow'
+          },
+          {
+            src: 'Screenshots/expenses.jpeg',
+            sizes: '1080x2340',
+            type: 'image/jpeg',
+            form_factor: 'narrow'
+          },
+          {
+            src: 'Screenshots/summary.jpeg',
+            sizes: '1080x2340',
+            type: 'image/jpeg',
+            form_factor: 'narrow'
+          },
+          {
+            src: 'Screenshots/report.jpeg',
+            sizes: '1080x2340',
+            type: 'image/jpeg',
+            form_factor: 'narrow'
+          }
+        ],
         icons: [
           {
             src: 'Assets/icon-darkbg.png',
