@@ -12,6 +12,7 @@ export interface Expense {
     id: string;
     title: string;
     amount: number;
+    poolUsed?: number;
     paidBy: PaymentContribution[];
     participants: string[]; // memberIds
 }

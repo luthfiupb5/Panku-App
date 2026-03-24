@@ -19,20 +19,13 @@ export const ResultsScreen: React.FC = () => {
         const isFundMode = currentEvent.mode === 'fund';
         const tFund = isFundMode ? (currentEvent.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
         const tSpentFromFund = isFundMode ? currentEvent.expenses.reduce((s, e) => {
+            if (e.poolUsed !== undefined) return s + e.poolUsed;
             const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
             return s + (e.amount - membersPaid);
         }, 0) : 0;
-        const rFund = tFund - tSpentFromFund;
+        const rFund = Math.max(0, tFund - tSpentFromFund);
 
         let balanceList = [...calculatedBalances];
-        if (isFundMode && Math.abs(rFund) > 0.01) {
-            balanceList.push({
-                memberId: 'FUND_BOX',
-                totalPaid: 0,
-                totalShare: 0,
-                balance: -rFund // Inverse: Fund contains money -> Fund owes members -> Negative balance (debtor). 
-            });
-        }
 
         const calculatedSettlements = calculateSettlements(balanceList);
         
@@ -50,7 +43,6 @@ export const ResultsScreen: React.FC = () => {
     const isFundMode = currentEvent.mode === 'fund';
 
     const getMemberName = (id: string) => {
-        if (id === 'FUND_BOX') return 'Group Fund';
         return currentEvent.members.find(m => m.id === id)?.name ?? 'Unknown';
     };
 
@@ -91,26 +83,26 @@ export const ResultsScreen: React.FC = () => {
                     {isFundMode && (
                         <div className="panku-card overflow-hidden">
                             <div className="px-5 py-4 border-b border-white/[0.04]">
-                                <h3 className="font-bold text-[#E8EDF2]">Fund Summary</h3>
+                                <h3 className="font-bold text-[#E8EDF2]">Trip Pool Summary</h3>
                             </div>
                             <div className="p-5 flex flex-col gap-3">
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-[#94A3B8]">Initial Fund</span>
+                                    <span className="text-[#94A3B8]">Initial Pool</span>
                                     <span className="font-bold text-[#E8EDF2]">{formatCurrency(totalFund)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-[#94A3B8]">Spent from Fund</span>
+                                    <span className="text-[#94A3B8]">Spent from Pool</span>
                                     <span className="font-bold text-[#EF4444]">{formatCurrency(totalSpentFromFund)}</span>
                                 </div>
                                 <div className="flex justify-between items-center pt-3 border-t border-white/10">
-                                    <span className="font-bold text-[#E8EDF2]">Remaining Fund</span>
-                                    <span className={`font-black text-lg ${remainingFund >= 0 ? 'text-[#2DD4BF]' : 'text-[#EF4444]'}`}>
+                                    <span className="font-bold text-[#E8EDF2]">Remaining Pool</span>
+                                    <span className={`font-black text-lg text-[#2DD4BF]`}>
                                         {formatCurrency(remainingFund)}
                                     </span>
                                 </div>
                                 {remainingFund > 0 && (
                                     <div className="mt-2 text-[11px] text-[#2DD4BF] bg-[#2DD4BF]/10 p-3 rounded-xl border border-[#2DD4BF]/20 leading-relaxed">
-                                        The remaining <strong>{formatCurrency(remainingFund)}</strong> should be redistributed to members exactly matching their positive balances below.
+                                        The remaining <strong>{formatCurrency(remainingFund)}</strong> acts as a credit and is redistributed natively in the balances below.
                                     </div>
                                 )}
                             </div>

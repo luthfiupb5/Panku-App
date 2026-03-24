@@ -17,15 +17,33 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
     const [amount, setAmount] = useState('');
     const [isMultiPayer, setIsMultiPayer] = useState(false);
     const isFundMode = currentEvent?.mode === 'fund';
-    const [singlePayerId, setSinglePayerId] = useState(isFundMode ? 'FUND' : (currentEvent?.members[0]?.id ?? ''));
+
+    const availablePool = React.useMemo(() => {
+        if (!isFundMode || !currentEvent) return 0;
+        const totalFund = (currentEvent.fundDeposits || []).reduce((s, d) => s + d.amount, 0);
+        const totalSpent = currentEvent.expenses.reduce((s, e) => {
+            if (e.poolUsed !== undefined) return s + e.poolUsed;
+            const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
+            return s + (e.amount - membersPaid);
+        }, 0);
+        return Math.max(0, totalFund - totalSpent);
+    }, [currentEvent, isFundMode]);
+
+    const [useTripPool, setUseTripPool] = useState(true);
+    const [singlePayerId, setSinglePayerId] = useState(currentEvent?.members[0]?.id ?? '');
     const [multiPayerAmounts, setMultiPayerAmounts] = useState<Record<string, string>>({});
     const [participants, setParticipants] = useState<Set<string>>(
         new Set(currentEvent?.members.map(m => m.id))
     );
 
+    const parsedAmount = parseFloat(amount) || 0;
+    const poolUsedAmt = (isFundMode && useTripPool && availablePool > 0) ? Math.min(parsedAmount, availablePool) : 0;
+    const remainingAmt = Math.max(0, Math.round((parsedAmount - poolUsedAmt) * 100) / 100);
+    const showRemainingWarning = isFundMode && poolUsedAmt > 0 && remainingAmt > 0;
+
     useEffect(() => {
-        if (currentEvent?.members[0] && !singlePayerId) setSinglePayerId(isFundMode ? 'FUND' : currentEvent.members[0].id);
-    }, [currentEvent, singlePayerId, isFundMode]);
+        if (currentEvent?.members[0] && !singlePayerId) setSinglePayerId(currentEvent.members[0].id);
+    }, [currentEvent, singlePayerId]);
 
     if (!currentEvent || currentEvent.members.length === 0) {
         return (
@@ -51,25 +69,23 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
         const totalAmt = parseFloat(amount);
         let paidBy: PaymentContribution[] = [];
 
-        if (isMultiPayer) {
-            if (Math.abs(totalAmt - multiTotal) > 0.01) {
-                alert(`Amounts don't match: paid ${multiTotal.toFixed(2)} vs ${totalAmt.toFixed(2)}`);
-                return;
-            }
-            currentEvent.members.forEach(m => {
-                const p = parseFloat(multiPayerAmounts[m.id]);
-                if (p > 0) paidBy.push({ memberId: m.id, amount: p });
-            });
-            if (!paidBy.length) { alert('Enter payment amounts.'); return; }
-        } else {
-            if (singlePayerId === 'FUND') {
-                paidBy = []; 
+        if (remainingAmt > 0) {
+            if (isMultiPayer) {
+                if (Math.abs(remainingAmt - multiTotal) > 0.01) {
+                    alert(`Amounts don't match: split ${multiTotal.toFixed(2)} vs remaining ${remainingAmt.toFixed(2)}`);
+                    return;
+                }
+                currentEvent.members.forEach(m => {
+                    const p = parseFloat(multiPayerAmounts[m.id]);
+                    if (p > 0) paidBy.push({ memberId: m.id, amount: p });
+                });
+                if (!paidBy.length) { alert('Enter payment amounts.'); return; }
             } else {
-                paidBy = [{ memberId: singlePayerId, amount: totalAmt }];
+                paidBy = [{ memberId: singlePayerId, amount: remainingAmt }];
             }
         }
 
-        addExpense({ id: crypto.randomUUID(), title: title.trim(), amount: totalAmt, paidBy, participants: Array.from(participants) } as Expense);
+        addExpense({ id: crypto.randomUUID(), title: title.trim(), amount: totalAmt, poolUsed: poolUsedAmt, paidBy, participants: Array.from(participants) } as Expense);
         onSave();
     };
 
@@ -113,84 +129,95 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onCancel, onSave }) =>
                     />
                 </div>
 
-                {/* Who paid */}
-                <div className="panku-card-inner p-4">
-                    <div className="flex items-center justify-between mb-4">
-                        <label className="text-sm font-semibold text-[#E8EDF2]">Who Paid?</label>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs text-[#66707A]">Split Payment</span>
-                            <button
-                                type="button"
-                                onClick={() => setIsMultiPayer(!isMultiPayer)}
-                                className={`w-10 h-5 rounded-full transition-all relative ${isMultiPayer ? 'bg-teal-gradient' : 'bg-[#66707A]/40'}`}
-                            >
-                                <div className={`absolute top-0.5 bg-white w-4 h-4 rounded-full shadow transition-transform ${isMultiPayer ? 'left-5' : 'left-0.5'}`} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {!isMultiPayer ? (
-                        <select
-                            value={singlePayerId}
-                            onChange={e => setSinglePayerId(e.target.value)}
-                            className="panku-input"
-                        >
-                            {isFundMode && <option value="FUND">Group Fund</option>}
-                            {currentEvent.members.map(m => (
-                                <option key={m.id} value={m.id}>{m.name}</option>
-                            ))}
-                        </select>
-                    ) : (
-                        <div className="space-y-3">
-                            {isFundMode && (
-                                <div className="flex items-center gap-3">
-                                    <span className="w-7 h-7 rounded-full bg-[#2DD4BF]/10 text-[10px] font-bold text-[#2DD4BF] border border-[#2DD4BF]/20 flex items-center justify-center shrink-0">
-                                        FD
-                                    </span>
-                                    <span className="flex-1 text-sm text-[#2DD4BF] font-medium">Group Fund</span>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#66707A] text-sm">₹</span>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            placeholder="0"
-                                            value={multiPayerAmounts['FUND'] ?? ''}
-                                            onChange={e => setMultiPayerAmounts({ ...multiPayerAmounts, ['FUND']: e.target.value })}
-                                            className="panku-input w-28 pl-7 pr-3 py-2 text-sm"
-                                        />
-                                    </div>
-                                </div>
+                {/* Use Trip Pool */}
+                {isFundMode && availablePool > 0 && (
+                    <div className="panku-card-inner p-4 flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-semibold text-[#E8EDF2]">Use Trip Pool?</p>
+                            <p className="text-xs text-[#2DD4BF] mt-0.5">Available: ₹{availablePool.toFixed(2)}</p>
+                            {useTripPool && parsedAmount > 0 && (
+                                <p className="text-[11px] text-[#9AA4AF] mt-1">
+                                    Using <strong className="text-[#E8EDF2]">₹{poolUsedAmt.toFixed(2)}</strong> from pool.
+                                </p>
                             )}
-                            {currentEvent.members.map(m => (
-                                <div key={m.id} className="flex items-center gap-3">
-                                    <span className={`w-7 h-7 rounded-full ${getAvatarClass(m.name)} text-[10px] font-bold text-[#0B0F14] flex items-center justify-center shrink-0`}>
-                                        {m.name.charAt(0).toUpperCase()}
-                                    </span>
-                                    <span className="flex-1 text-sm text-[#E8EDF2] font-medium">{m.name}</span>
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#66707A] text-sm">₹</span>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            placeholder="0"
-                                            value={multiPayerAmounts[m.id] ?? ''}
-                                            onChange={e => setMultiPayerAmounts({ ...multiPayerAmounts, [m.id]: e.target.value })}
-                                            className="panku-input w-28 pl-7 pr-3 py-2 text-sm"
-                                        />
-                                    </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setUseTripPool(!useTripPool)}
+                            className={`w-12 h-6 rounded-full transition-all relative ${useTripPool ? 'bg-teal-gradient' : 'bg-[#66707A]/40'}`}
+                        >
+                            <div className={`absolute top-1 bg-white w-4 h-4 rounded-full shadow transition-transform ${useTripPool ? 'left-7' : 'left-1'}`} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Who paid */}
+                {remainingAmt > 0 && (
+                    <div className={showRemainingWarning ? "panku-card-inner p-4 border border-[#FF4757]/20 relative overflow-hidden" : "mb-5"}>
+                        {showRemainingWarning && <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF4757]/5 rounded-full blur-2xl pointer-events-none" />}
+                        <div className={`flex items-center justify-between ${showRemainingWarning ? 'mb-4 relative z-10' : 'mb-3'}`}>
+                            {showRemainingWarning ? (
+                                <div>
+                                    <label className="text-sm font-bold text-[#FF4757]">Remaining to Split</label>
+                                    <p className="text-[10px] text-[#9AA4AF] mt-0.5 uppercase tracking-wider">₹{remainingAmt.toFixed(2)} must be paid out-of-pocket</p>
                                 </div>
-                            ))}
-                            <div className="flex justify-between items-center pt-2 border-t border-white/[0.04]">
-                                <span className="text-xs text-[#66707A]">Total Split</span>
-                                <span className={`text-sm font-bold ${Math.abs(parseFloat(amount||'0') - multiTotal) > 0.01 ? 'text-[#FF4757]' : 'text-[#2ED573]'}`}>
-                                    ₹{multiTotal.toFixed(2)} / ₹{parseFloat(amount||'0').toFixed(2)}
-                                </span>
+                            ) : (
+                                <label className="text-sm font-semibold text-[#E8EDF2]">Who Paid?</label>
+                            )}
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-[#66707A]">Split</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsMultiPayer(!isMultiPayer)}
+                                    className={`w-10 h-5 rounded-full transition-all relative ${isMultiPayer ? (showRemainingWarning ? 'bg-[#FF4757]' : 'bg-[#2DD4BF]') : 'bg-[#66707A]/40'}`}
+                                >
+                                    <div className={`absolute top-0.5 bg-white w-4 h-4 rounded-full shadow transition-transform ${isMultiPayer ? 'left-5' : 'left-0.5'}`} />
+                                </button>
                             </div>
                         </div>
-                    )}
-                </div>
+
+                        {!isMultiPayer ? (
+                            <select
+                                value={singlePayerId}
+                                onChange={e => setSinglePayerId(e.target.value)}
+                                className={`panku-input ${showRemainingWarning ? 'relative z-10' : ''}`}
+                            >
+                                {currentEvent.members.map(m => (
+                                    <option key={m.id} value={m.id}>{m.name}</option>
+                                ))}
+                            </select>
+                        ) : (
+                            <div className={`space-y-3 ${showRemainingWarning ? 'relative z-10' : ''}`}>
+                                {currentEvent.members.map(m => (
+                                    <div key={m.id} className="flex items-center gap-3">
+                                        <span className={`w-7 h-7 rounded-full ${getAvatarClass(m.name)} text-[10px] font-bold text-[#0B0F14] flex items-center justify-center shrink-0`}>
+                                            {m.name.charAt(0).toUpperCase()}
+                                        </span>
+                                        <span className="flex-1 text-sm text-[#E8EDF2] font-medium">{m.name}</span>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#66707A] text-sm">₹</span>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                placeholder="0"
+                                                value={multiPayerAmounts[m.id] ?? ''}
+                                                onChange={e => setMultiPayerAmounts({ ...multiPayerAmounts, [m.id]: e.target.value })}
+                                                className="panku-input w-28 pl-7 pr-3 py-2 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                                <div className="flex justify-between items-center pt-2 border-t border-white/[0.04]">
+                                    <span className="text-xs text-[#66707A]">Total Split</span>
+                                    <span className={`text-sm font-bold ${Math.abs(remainingAmt - multiTotal) > 0.01 ? 'text-[#FF4757]' : 'text-[#2ED573]'}`}>
+                                        ₹{multiTotal.toFixed(2)} / ₹{remainingAmt.toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Participants - chips */}
                 <div>

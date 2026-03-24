@@ -101,25 +101,17 @@ export const generatePDF = async (event: SplitterEvent) => {
         const isFundMode = event.mode === 'fund';
         const tFund = isFundMode ? (event.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
         const tSpentFromFund = isFundMode ? event.expenses.reduce((s, e) => {
+            if (e.poolUsed !== undefined) return s + e.poolUsed;
             const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
             return s + (e.amount - membersPaid);
         }, 0) : 0;
-        const rFund = tFund - tSpentFromFund;
+        const rFund = Math.max(0, tFund - tSpentFromFund);
 
         let balanceList = [...balances];
-        if (isFundMode && Math.abs(rFund) > 0.01) {
-            balanceList.push({
-                memberId: 'FUND_BOX',
-                totalPaid: 0,
-                totalShare: 0,
-                balance: -rFund 
-            });
-        }
         
         const settlements = calculateSettlements(balanceList);
         
         const getMemberName = (id: string) => {
-            if (id === 'FUND_BOX') return 'Group Fund [Box]';
             return event.members.find(m => m.id === id)?.name ?? 'Unknown';
         };
 
@@ -127,18 +119,18 @@ export const generatePDF = async (event: SplitterEvent) => {
         currentY += 15;
         
         if (isFundMode) {
-            addText('Fund Summary', margin, currentY, 14, primaryText, true);
+            addText('Trip Pool Summary', margin, currentY, 14, primaryText, true);
             currentY += 8;
-            addText('Initial Fund:', margin, currentY, 11, secondaryText);
+            addText('Initial Pool:', margin, currentY, 11, secondaryText);
             addText(formatForPDF(tFund), margin + 40, currentY, 11, primaryText, true);
 
             currentY += 7;
-            addText('Spent from Fund:', margin, currentY, 11, secondaryText);
+            addText('Spent from Pool:', margin, currentY, 11, secondaryText);
             addText(formatForPDF(tSpentFromFund), margin + 40, currentY, 11, '#EF4444', true);
 
             currentY += 7;
-            addText('Remaining Fund:', margin, currentY, 11, secondaryText);
-            addText(formatForPDF(rFund), margin + 40, currentY, 11, rFund >= 0 ? accent : '#EF4444', true);
+            addText('Remaining Pool:', margin, currentY, 11, secondaryText);
+            addText(formatForPDF(rFund), margin + 40, currentY, 11, accent, true);
             
             currentY += 12;
             pdf.setDrawColor('#E8EDF2');

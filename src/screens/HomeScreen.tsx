@@ -141,8 +141,8 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                         <input type="radio" name="mode" value="fund" checked={mode === 'fund'} onChange={() => setMode('fund')} className="accent-[#2DD4BF] w-4 h-4" />
                                     </div>
                                     <div>
-                                        <p className={`font-bold text-sm ${mode === 'fund' ? 'text-[#2DD4BF]' : 'text-[#E8EDF2]'}`}>Use Group Fund <span className="opacity-70">(Initial Deposit)</span></p>
-                                        <p className="text-xs text-[#9AA4AF] mt-0.5">Everyone contributes money to a common fund. Expenses are paid from that fund.</p>
+                                        <p className={`font-bold text-sm ${mode === 'fund' ? 'text-[#2DD4BF]' : 'text-[#E8EDF2]'}`}>Use Trip Pool <span className="opacity-70">(Initial Deposit)</span></p>
+                                        <p className="text-xs text-[#9AA4AF] mt-0.5">Everyone contributes money to a common pool. Expenses are paid from that pool.</p>
                                     </div>
                                 </label>
                             </div>

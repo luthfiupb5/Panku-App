@@ -33,7 +33,7 @@ export const FundDepositsScreen: React.FC = () => {
         <div className="pb-24">
             <div className="mb-5">
                 <h2 className="text-2xl font-extrabold text-[#E8EDF2]">Deposits</h2>
-                <p className="text-[#9AA4AF] text-sm mt-0.5">Manage the shared group fund.</p>
+                <p className="text-[#9AA4AF] text-sm mt-0.5">Manage the shared trip pool.</p>
             </div>
 
             {/* Total Fund Card */}
@@ -43,7 +43,7 @@ export const FundDepositsScreen: React.FC = () => {
                 className="relative rounded-[24px] p-6 mb-6 overflow-hidden shadow-[0_8px_32px_rgba(45,212,191,0.25)] border border-white/20 bg-teal-gradient"
             >
                 <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/30 rounded-full blur-xl mix-blend-overlay" />
-                <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Fund</p>
+                <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Pool</p>
                 <h3 className="text-4xl font-black text-[#030609] tracking-tight">{formatCurrency(totalFund)}</h3>
                 <div className="mt-2 text-sm text-[#030609]/80 font-medium z-10 relative">
                     {currentEvent.fundDeposits?.length || 0} Deposits Collected
@@ -85,7 +85,7 @@ export const FundDepositsScreen: React.FC = () => {
                         </div>
                     </div>
                     <button type="submit" className="btn-teal w-full py-3 font-bold flex items-center justify-center gap-2">
-                        <Plus size={18} /> Add to Fund
+                        <Plus size={18} /> Add to Pool
                     </button>
                 </form>
             </div>

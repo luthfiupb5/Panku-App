@@ -19,15 +19,16 @@ export const DashboardScreen: React.FC = () => {
     const isFundMode = currentEvent.mode === 'fund';
     const totalFund = isFundMode ? (currentEvent.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
     
-    // In Fund Mode, the "Spent" from the fund is the total cost minus amounts paid out-of-pocket
+    // In Fund Mode, the "Spent" from the pool is explicitly tracked via poolUsed (with legacy fallback)
     const totalSpentFromFund = isFundMode 
         ? currentEvent.expenses.reduce((s, e) => {
+            if (e.poolUsed !== undefined) return s + e.poolUsed;
             const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
             return s + (e.amount - membersPaid);
         }, 0) 
         : totalEventCost;
 
-    const remainingFund = totalFund - totalSpentFromFund;
+    const remainingFund = Math.max(0, totalFund - totalSpentFromFund);
     const usagePercent = totalFund > 0 ? Math.min((totalSpentFromFund / totalFund) * 100, 100) : 0;
 
     const handleAddMember = (e: React.FormEvent) => {
@@ -60,7 +61,7 @@ export const DashboardScreen: React.FC = () => {
                 
                 {isFundMode ? (
                     <>
-                        <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Trip Fund</p>
+                        <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Trip Pool</p>
                         <h3 className="text-4xl font-black text-[#030609] tracking-tight mb-5">{formatCurrency(totalFund)}</h3>
                         
                         <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
@@ -84,6 +85,17 @@ export const DashboardScreen: React.FC = () => {
                             />
                         </div>
                         <p className="text-[10px] text-[#030609]/70 font-semibold text-right relative z-10">{usagePercent.toFixed(0)}% Used</p>
+
+                        <div className="mt-5 pt-4 border-t border-[#030609]/15 flex items-end justify-between relative z-10">
+                            <div>
+                                <p className="text-[#030609]/70 text-[10px] font-bold uppercase tracking-wider mb-0.5">Total Event Cost</p>
+                                <p className="font-black text-[#030609] text-xl leading-none">{formatCurrency(totalEventCost)}</p>
+                            </div>
+                            <div className="text-right text-xs">
+                                <span className="text-[#030609]/70 block mb-0.5"><span className="font-bold text-[#030609]">{currentEvent.expenses.length}</span> Expenses</span>
+                                <span className="text-[#030609]/70 block"><span className="font-bold text-[#030609]">{currentEvent.members.length}</span> Members</span>
+                            </div>
+                        </div>
                     </>
                 ) : (
                     <>
