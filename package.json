@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite-react-ssg build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -20,6 +20,7 @@
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-helmet-async": "^3.0.0",
     "react-is": "^19.2.4",
     "recharts": "^3.8.0",
     "tailwind-merge": "^3.5.0",
@@ -39,10 +40,18 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "postcss": "^8.5.8",
-    "react-router-dom": "^7.13.1",
+    "react-router-dom": "^7.13.2",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "vite-react-ssg": "^0.9.1-beta.1"
+  },
+  "reactSnap": {
+    "source": "dist",
+    "minifyHtml": {
+      "collapseWhitespace": false,
+      "removeComments": false
+    }
   }
 }

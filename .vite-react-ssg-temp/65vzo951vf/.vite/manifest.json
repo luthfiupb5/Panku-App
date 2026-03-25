@@ -1,0 +1,15 @@
+{
+  "src/main.tsx": {
+    "file": "main.mjs",
+    "name": "main",
+    "src": "src/main.tsx",
+    "isEntry": true,
+    "assets": [
+      "assets/logo-darkbg-DEWQa8nl.png"
+    ]
+  },
+  "style.css": {
+    "file": "assets/style-BpwYByDi.css",
+    "src": "style.css"
+  }
+}
