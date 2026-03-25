@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://panku.watermelonbranding.in/sitemap.xml

@@ -1,0 +1,172 @@
+﻿
+> panku@0.0.0 build
+> tsc -b && vite-react-ssg build
+
+
+[vite-react-ssg] Build for client...
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+node.exe : Found 1 
+warning while 
+optimizing generated 
+CSS:
+At C:\Program Files\nod
+ejs\npm.ps1:29 char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Found 1 warni   
+ ng... generated CS    
+S::String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+
+[2mΓöé   }[22m
+[2mΓöé }[22m
+[2mΓöé[22m @import ur
+l('https://fonts.google
+apis.com/css2?family=In
+ter:wght@400;500;600;70
+0;800;900&display=swap'
+);
+[2mΓöå[22m        
+[33m[2m^--[22m 
+@import rules must 
+precede all rules 
+aside from @charset 
+and @layer 
+statements[39m
+[2mΓöå[22m
+[2mΓöé @layer base 
+{[22m
+[2mΓöé   html {[22m
+
+[32mΓ£ô[39m 3273 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mregisterSW.js                       [39m[1m[2m    0.13 kB[22m[1m[22m
+[2mdist/[22m[32mmanifest.webmanifest                [39m[1m[2m    1.01 kB[22m[1m[22m
+[2mdist/[22m[32m.vite/manifest.json                 [39m[1m[2m    1.42 kB[22m[1m[22m[2m Γöé gzip:   0.39 kB[22m
+[2mdist/[22m[32mindex.html                          [39m[1m[2m    3.94 kB[22m[1m[22m[2m Γöé gzip:   1.36 kB[22m
+[2mdist/[22m[32massets/logo-darkbg-DEWQa8nl.png     [39m[1m[2m   56.84 kB[22m[1m[22m
+[2mdist/[22m[32m.vite/ssr-manifest.json             [39m[1m[2m  107.57 kB[22m[1m[22m[2m Γöé gzip:   8.54 kB[22m
+[2mdist/[22m[35massets/app-BDrFeRaD.css             [39m[1m[2m   50.70 kB[22m[1m[22m[2m Γöé gzip:   9.62 kB[22m
+[2mdist/[22m[36massets/purify.es-BgtpMKW3.js        [39m[1m[2m   22.77 kB[22m[1m[22m[2m Γöé gzip:   8.79 kB[22m
+[2mdist/[22m[36massets/index.es-iUULqOFj.js         [39m[1m[2m  150.47 kB[22m[1m[22m[2m Γöé gzip:  51.44 kB[22m
+[2mdist/[22m[36massets/client-2-Nk_pKA.js           [39m[1m[2m  180.67 kB[22m[1m[22m[2m Γöé gzip:  56.92 kB[22m
+[2mdist/[22m[36massets/html2canvas.esm-CBrSDip1.js  [39m[1m[2m  201.42 kB[22m[1m[22m[2m Γöé gzip:  48.03 kB[22m
+[2mdist/[22m[36massets/app-87FMX-7b.js              [39m[1m[33m1,100.86 kB[39m[22m[2m Γöé gzip: 341.62 kB[22m
+[33m
+(!) Some chunks are 
+larger than 500 kB 
+after minification. 
+Consider:
+- Using dynamic 
+import() to code-split 
+the application
+- Use build.rollupOptio
+ns.output.manualChunks 
+to improve chunking: ht
+tps://rollupjs.org/conf
+iguration-options/#outp
+ut-manualchunks
+- Adjust chunk size 
+limit for this warning 
+via build.chunkSizeWarn
+ingLimit.[39m
+[32mΓ£ô built in 12.38s[39m
+
+PWA v1.2.0
+mode      generateSW
+precache  22 entries (1887.95 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-2c644346.js
+
+[vite-react-ssg] Build for server...
+[36mvite v5.4.21 [32mbuilding SSR bundle for production...[36m[39m
+transforming...
+Found 1 warning while 
+optimizing generated 
+CSS:
+
+[2mΓöé   }[22m
+[2mΓöé }[22m
+[2mΓöé[22m @import ur
+l('https://fonts.google
+apis.com/css2?family=In
+ter:wght@400;500;600;70
+0;800;900&display=swap'
+);
+[2mΓöå[22m        
+[33m[2m^--[22m 
+@import rules must 
+precede all rules 
+aside from @charset 
+and @layer 
+statements[39m
+[2mΓöå[22m
+[2mΓöé @layer base 
+{[22m
+[2mΓöé   html {[22m
+
+[32mΓ£ô[39m 26 modules transformed.
+rendering chunks...
+[2m.vite-react-ssg-temp/qqgc9bhseb/[22m[32mregisterSW.js              [39m[1m[2m  0.13 kB[22m[1m[22m
+[2m.vite-react-ssg-temp/qqgc9bhseb/[22m[32m.vite/manifest.json        [39m[1m[2m  0.27 kB[22m[1m[22m
+[2m.vite-react-ssg-temp/qqgc9bhseb/[22m[32mmanifest.webmanifest       [39m[1m[2m  1.01 kB[22m[1m[22m
+[2m.vite-react-ssg-temp/qqgc9bhseb/[22m[35massets/style-BpwYByDi.css  [39m[1m[2m 64.85 kB[22m[1m[22m
+[2m.vite-react-ssg-temp/qqgc9bhseb/[22m[36mmain.mjs                   [39m[1m[2m141.59 kB[22m[1m[22m
+[32mΓ£ô built in 311ms[39m
+(node:2952) [MODULE_TYP
+ELESS_PACKAGE_JSON] 
+Warning: file:///F:/pan
+ku%20app/node_modules/r
+eact-helmet-async/lib/i
+ndex.esm.js parsed as 
+an ES module because 
+module syntax was 
+detected; to avoid the 
+performance penalty of 
+syntax detection, add 
+"type": "module" to 
+F:\panku app\node_modul
+es\react-helmet-async\p
+ackage.json
+(Use `node 
+--trace-warnings ...` 
+to show where the 
+warning was created)
+
+[vite-react-ssg] Rendering Pages... (11)
+dist/blog/split-expenses-friends.html  11.54 KiB
+dist/use-cases/college-trip-expenses.html  8.10 KiB
+dist/compare/panku-vs-splitwise.html  10.62 KiB
+dist/index.html       7.18 KiB
+dist/blog/group-trip-expense-tracking.html  8.80 KiB
+dist/blog/offline-expense-tracker.html  8.26 KiB
+dist/use-cases/group-dinner-bill-split.html  9.14 KiB
+dist/how-it-works.html  8.86 KiB
+dist/about.html       10.43 KiB
+dist/blog/splitwise-alternative.html  10.64 KiB
+dist/blog.html        11.54 KiB
+
+[vite-react-ssg] Generating static loader data... (11)
+dist/static-loader-data-manifest-qqgc9bhseb.json  0.89 KiB
+
+[vite-react-ssg] Regenerate PWA...
+
+PWA v1.2.0
+mode      generateSW
+precache  32 entries (1989.28 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-2c644346.js
+
+[vite-react-ssg] Build finished.

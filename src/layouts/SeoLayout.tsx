@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { Header } from '../components/Header';
+import { SeoHeader } from '../components/SeoHeader';
 import { InstallPrompt } from '../components/InstallPrompt';
 
 export const SeoLayout: React.FC = () => {
@@ -15,7 +15,7 @@ export const SeoLayout: React.FC = () => {
         <div className="absolute inset-0 bg-[#05080c] mix-blend-overlay opacity-90"></div>
       </div>
 
-      <Header />
+      <SeoHeader />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 pb-32">
         <Outlet />
