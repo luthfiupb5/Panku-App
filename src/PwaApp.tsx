@@ -64,11 +64,11 @@ const AppContent: React.FC = () => {
             </main>
 
             {/* Floating pill navigation */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 px-4 pointer-events-none">
+            <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-safe-or-6 pb-6 px-3 pointer-events-none">
                 <nav
-                    className="pointer-events-auto flex items-center justify-between sm:justify-center gap-1 sm:gap-2 p-2 rounded-2xl w-full max-w-sm mx-auto"
+                    className="pointer-events-auto flex items-center w-full p-1.5 rounded-2xl"
                     style={{
-                        background: 'rgba(10, 28, 40, 0.75)',
+                        background: 'rgba(10, 28, 40, 0.85)',
                         backdropFilter: 'blur(32px)',
                         border: '1px solid rgba(255,255,255,0.06)',
                         boxShadow: '0 16px 40px -4px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)',
@@ -80,7 +80,7 @@ const AppContent: React.FC = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className="relative flex-1 sm:flex-none flex flex-col items-center justify-center px-1 sm:px-6 py-2.5 rounded-xl focus:outline-none transition-all"
+                                className="relative flex-1 flex flex-col items-center justify-center px-0.5 py-2 rounded-xl focus:outline-none transition-all min-w-0"
                             >
                                 {isActive && (
                                     <motion.div
@@ -89,7 +89,7 @@ const AppContent: React.FC = () => {
                                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                     />
                                 )}
-                                <span className={`relative flex flex-col items-center gap-1 transition-colors duration-200 ${isActive ? 'text-[#030609]' : 'text-[#9AA4AF] hover:text-[#E8EDF2]'}`}>
+                                <span className={`relative flex flex-col items-center gap-0.5 transition-colors duration-200 w-full ${isActive ? 'text-[#030609]' : 'text-[#9AA4AF] hover:text-[#E8EDF2]'}`}>
                                     {/* Badge for expenses count */}
                                     <span className="relative">
                                         {tab.icon}
@@ -99,7 +99,7 @@ const AppContent: React.FC = () => {
                                             </span>
                                         )}
                                     </span>
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider`}>{tab.label}</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-wide leading-none truncate w-full text-center">{tab.label}</span>
                                 </span>
                             </button>
                         );
