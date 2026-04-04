@@ -211,10 +211,21 @@
   .avatar-6 { background: linear-gradient(135deg, #34D399, #10B981); }
   .avatar-7 { background: linear-gradient(135deg, #D946EF, #A855F7); }
 
+  /* Geometric Grid & Patterns */
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .bg-dot-pattern {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
   /* Animations & Visual Effects */
-  .animate-blob { animation: blob 10s infinite alternate ease-in-out; }
-  .animation-delay-2000 { animation-delay: 2s; }
-  .animation-delay-4000 { animation-delay: 4s; }
+  .animate-float-slow { animation: floatSlow 15s ease-in-out infinite alternate; }
+  .animate-float-delayed { animation: floatSlow 18s ease-in-out infinite alternate-reverse; animation-delay: 2s; }
+  .animate-slide-diagonal { animation: slideDiagonal 8s linear infinite; }
 
   /* Glow Utilities */
   .glow-teal {
@@ -227,10 +238,16 @@
   }
 }
 
-@keyframes blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(20px, -30px) scale(1.05); }
-  66% { transform: translate(-15px, 15px) scale(0.95); }
+@keyframes floatSlow {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(15px, -20px) rotate(3deg); }
+}
+
+@keyframes slideDiagonal {
+  0% { transform: translate(-10%, -10%); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translate(110%, 110%); opacity: 0; }
 }
 
 @keyframes countUp {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, UserMinus, Users } from 'lucide-react';
+import { UserPlus, UserMinus, Users, Edit3, Check, X, QrCode } from 'lucide-react';
 
 const AVATAR_COLORS = [
     { ring: '#9BE15D', bg: 'avatar-0' },
@@ -16,8 +16,12 @@ const AVATAR_COLORS = [
 const getAvatar = (name: string) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 export const MembersScreen: React.FC = () => {
-    const { currentEvent, addMember, removeMember } = useAppContext();
+    const { currentEvent, addMember, removeMember, updateMember } = useAppContext();
     const [newMemberName, setNewMemberName] = useState('');
+
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editName, setEditName] = useState('');
+    const [editUpi, setEditUpi] = useState('');
 
     if (!currentEvent) return null;
 
@@ -29,6 +33,18 @@ export const MembersScreen: React.FC = () => {
         if (exists) { alert('A member with this name already exists.'); return; }
         addMember({ id: crypto.randomUUID(), name: trimmed });
         setNewMemberName('');
+    };
+
+    const startEdit = (member: any) => {
+        setEditingId(member.id);
+        setEditName(member.name);
+        setEditUpi(member.upi_id || '');
+    };
+
+    const saveEdit = () => {
+        if (!editingId || !editName.trim()) return;
+        updateMember(editingId, { name: editName.trim(), upi_id: editUpi.trim() || undefined });
+        setEditingId(null);
     };
 
     return (
@@ -83,6 +99,8 @@ export const MembersScreen: React.FC = () => {
                         <AnimatePresence>
                             {currentEvent.members.map((member, idx) => {
                                 const av = getAvatar(member.name);
+                                const isEditing = editingId === member.id;
+
                                 return (
                                     <motion.li
                                         key={member.id}
@@ -92,22 +110,74 @@ export const MembersScreen: React.FC = () => {
                                         transition={{ delay: idx * 0.04 }}
                                         className="flex items-center justify-between px-5 py-4 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors group"
                                     >
-                                        <div className="flex items-center gap-3.5">
-                                            {/* Colored ring avatar */}
-                                            <div
-                                                className={`w-10 h-10 rounded-full ${av.bg} flex items-center justify-center font-bold text-[#0B0F14] text-sm shrink-0`}
-                                                style={{ boxShadow: `0 0 0 2px #141A21, 0 0 0 4px ${av.ring}40` }}
-                                            >
-                                                {member.name.charAt(0).toUpperCase()}
+                                        {isEditing ? (
+                                            <div className="w-full flex flex-col gap-3 animation-fade-in py-1">
+                                                <div className="flex gap-3">
+                                                    <div className="flex-1 space-y-3">
+                                                        <div>
+                                                            <label className="block text-[10px] uppercase font-bold text-[#66707A] mb-1 ml-1">Name</label>
+                                                            <input
+                                                                value={editName}
+                                                                onChange={e => setEditName(e.target.value)}
+                                                                className="panku-input text-sm py-2 px-3 focus:border-[#9BE15D]/50"
+                                                                placeholder="Name"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[10px] uppercase font-bold text-[#66707A] mb-1 ml-1">UPI ID (Optional)</label>
+                                                            <input
+                                                                value={editUpi}
+                                                                onChange={e => setEditUpi(e.target.value)}
+                                                                className="panku-input text-sm py-2 px-3 border-[#33DBC5]/30 focus:border-[#33DBC5]/60 bg-[#33DBC5]/5"
+                                                                placeholder="e.g. name@okhdfcbank"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col gap-2 justify-end">
+                                                        <button onClick={saveEdit} disabled={!editName.trim()} className="bg-[#9BE15D] text-[#0B0F14] p-2 rounded-xl disabled:opacity-50">
+                                                            <Check size={18} />
+                                                        </button>
+                                                        <button onClick={() => setEditingId(null)} className="bg-white/10 text-white p-2 rounded-xl">
+                                                            <X size={18} />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <span className="font-semibold text-[#E8EDF2] text-sm">{member.name}</span>
-                                        </div>
-                                        <button
-                                            onClick={() => removeMember(member.id)}
-                                            className="text-[#66707A] hover:text-[#FF4757] p-2 rounded-xl hover:bg-[#FF4757]/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
-                                        >
-                                            <UserMinus size={18} />
-                                        </button>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-3.5 overflow-hidden">
+                                                    {/* Colored ring avatar */}
+                                                    <div
+                                                        className={`w-10 h-10 rounded-full ${av.bg} flex items-center justify-center font-bold text-[#0B0F14] text-sm shrink-0`}
+                                                        style={{ boxShadow: `0 0 0 2px #141A21, 0 0 0 4px ${av.ring}40` }}
+                                                    >
+                                                        {member.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="font-semibold text-[#E8EDF2] text-sm truncate">{member.name}</span>
+                                                        {member.upi_id && (
+                                                            <span className="text-[10px] text-[#33DBC5] font-medium flex items-center gap-1 mt-0.5 max-w-[150px] truncate">
+                                                                <QrCode size={10} /> {member.upi_id}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => startEdit(member)}
+                                                        className="text-[#9AA4AF] hover:text-[#9BE15D] p-2 rounded-xl hover:bg-[#9BE15D]/10 transition-all"
+                                                    >
+                                                        <Edit3 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => removeMember(member.id)}
+                                                        className="text-[#66707A] hover:text-[#FF4757] p-2 rounded-xl hover:bg-[#FF4757]/10 transition-all"
+                                                    >
+                                                        <UserMinus size={18} />
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </motion.li>
                                 );
                             })}

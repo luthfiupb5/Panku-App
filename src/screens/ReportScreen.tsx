@@ -3,7 +3,8 @@ import { useAppContext } from '../context/AppContext';
 import { formatCurrency, calculateBalances } from '../utils/calculations';
 import { generatePDF } from '../utils/pdfExport';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Download, CheckCircle2, BarChart3, TrendingUp, PieChart as PieIcon } from 'lucide-react';
+import { Download, CheckCircle2, BarChart3, TrendingUp, PieChart as PieIcon, QrCode } from 'lucide-react';
+import { SettlementModal } from '../components/SettlementModal';
 
 const CHART_COLORS = ['#38F2C2', '#33DBC5', '#41C6A6', '#48C1E7', '#FB9061'];
 
@@ -11,6 +12,7 @@ export const ReportScreen: React.FC = () => {
     const { currentEvent } = useAppContext();
     const [isExporting, setIsExporting] = useState(false);
     const [exportSuccess, setExportSuccess] = useState(false);
+    const [isSettlementOpen, setIsSettlementOpen] = useState(false);
 
     const { chartsData } = useMemo(() => {
         if (!currentEvent) return { totalExpense: 0, chartsData: null };
@@ -141,8 +143,21 @@ export const ReportScreen: React.FC = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Bottom CTA */}
+                    <div className="pt-2 pb-4">
+                        <button
+                            onClick={() => setIsSettlementOpen(true)}
+                            className="w-full bg-[#38F2C2] hover:bg-[#2DD4BF] text-[#0A1C28] font-black py-4 rounded-xl shadow-[0_0_20px_rgba(56,242,194,0.3)] hover:shadow-[0_0_30px_rgba(56,242,194,0.5)] transition-all flex items-center justify-center gap-2"
+                        >
+                            <QrCode size={20} />
+                            Settle All Payments
+                        </button>
+                    </div>
                 </div>
             )}
+
+            {isSettlementOpen && <SettlementModal onClose={() => setIsSettlementOpen(false)} />}
         </div>
     );
 };

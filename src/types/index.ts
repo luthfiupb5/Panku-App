@@ -1,6 +1,7 @@
 export interface Member {
     id: string;
     name: string;
+    upi_id?: string;
 }
 
 export interface PaymentContribution {
@@ -24,6 +25,15 @@ export interface FundDeposit {
     date: string;
 }
 
+export interface Transaction {
+    id: string;
+    from_member_id: string;
+    to_member_id: string;
+    amount: number;
+    status: 'pending' | 'paid';
+    timestamp: string;
+}
+
 export interface SplitterEvent {
     id: string;
     name: string;
@@ -32,6 +42,7 @@ export interface SplitterEvent {
     expenses: Expense[];
     mode?: 'normal' | 'fund';
     fundDeposits?: FundDeposit[];
+    transactions?: Transaction[];
 }
 
 export interface Settlement {

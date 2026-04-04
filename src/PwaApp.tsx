@@ -10,6 +10,7 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { FundDepositsScreen } from './screens/FundDepositsScreen';
 import { Home, Receipt, PieChart, BarChart3, Wallet } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Plasma from './components/Plasma';
 
 type Tab = 'home' | 'fund' | 'expenses' | 'summary' | 'report';
 
@@ -29,16 +30,16 @@ const AppContent: React.FC = () => {
     const isFundMode = currentEvent.mode === 'fund';
     const iconSize = isFundMode ? 18 : 20;
     const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = isFundMode ? [
-        { id: 'home',     label: 'Home',     icon: <Home size={iconSize} /> },
-        { id: 'fund',     label: 'Deposits', icon: <Wallet size={iconSize} /> },
+        { id: 'home', label: 'Home', icon: <Home size={iconSize} /> },
+        { id: 'fund', label: 'Deposits', icon: <Wallet size={iconSize} /> },
         { id: 'expenses', label: 'Expenses', icon: <Receipt size={iconSize} /> },
-        { id: 'summary',  label: 'Summary',  icon: <PieChart size={iconSize} /> },
-        { id: 'report',   label: 'Report',   icon: <BarChart3 size={iconSize} /> },
+        { id: 'summary', label: 'Summary', icon: <PieChart size={iconSize} /> },
+        { id: 'report', label: 'Report', icon: <BarChart3 size={iconSize} /> },
     ] : [
-        { id: 'home',     label: 'Home',     icon: <Home size={iconSize} /> },
+        { id: 'home', label: 'Home', icon: <Home size={iconSize} /> },
         { id: 'expenses', label: 'Expenses', icon: <Receipt size={iconSize} /> },
-        { id: 'summary',  label: 'Summary',  icon: <PieChart size={iconSize} /> },
-        { id: 'report',   label: 'Report',   icon: <BarChart3 size={iconSize} /> },
+        { id: 'summary', label: 'Summary', icon: <PieChart size={iconSize} /> },
+        { id: 'report', label: 'Report', icon: <BarChart3 size={iconSize} /> },
     ];
 
     return (
@@ -55,11 +56,11 @@ const AppContent: React.FC = () => {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.18, ease: 'easeOut' }}
                     >
-                        {activeTab === 'home'     && <DashboardScreen />}
-                        {activeTab === 'fund'     && <FundDepositsScreen />}
+                        {activeTab === 'home' && <DashboardScreen />}
+                        {activeTab === 'fund' && <FundDepositsScreen />}
                         {activeTab === 'expenses' && <ExpensesScreen />}
-                        {activeTab === 'summary'  && <ResultsScreen />}
-                        {activeTab === 'report'   && <ReportScreen />}
+                        {activeTab === 'summary' && <ResultsScreen />}
+                        {activeTab === 'report' && <ReportScreen />}
                     </motion.div>
                 </AnimatePresence>
             </main>
@@ -141,12 +142,15 @@ const AppContent: React.FC = () => {
 export const PwaApp: React.FC = () => (
     <AppProvider>
         {/* Global Animated Background Mesh */}
-        <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1] overflow-hidden">
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#14B8A6] rounded-full mix-blend-screen filter blur-[120px] opacity-[0.04] animate-blob" />
-            <div className="absolute top-[20%] right-[-5%] w-[400px] h-[400px] bg-[#2DD4BF] rounded-full mix-blend-screen filter blur-[100px] opacity-[0.05] animate-blob animation-delay-2000" />
-            <div className="absolute bottom-[-15%] left-[10%] w-[600px] h-[600px] bg-[#38F2C2] rounded-full mix-blend-screen filter blur-[140px] opacity-[0.03] animate-blob animation-delay-4000" />
-            <div className="absolute top-[40%] left-[40%] w-[300px] h-[300px] bg-[#0A1C28] rounded-full mix-blend-overlay filter blur-[80px] opacity-[0.8]" />
-            <div className="absolute inset-0 bg-[#05080c] mix-blend-overlay opacity-90"></div>
+        <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1] overflow-hidden bg-[#05080c]">
+            <Plasma 
+              color="#14B8A6"
+              speed={0.6}
+              direction="forward"
+              scale={1.1}
+              opacity={0.6}
+              mouseInteractive={true}
+            />
         </div>
         <AppContent />
         <InstallPrompt />

@@ -2,18 +2,22 @@ import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { SeoHeader } from '../components/SeoHeader';
 import { InstallPrompt } from '../components/InstallPrompt';
+import Plasma from '../components/Plasma';
 
 export const SeoLayout: React.FC = () => {
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden bg-transparent flex flex-col relative z-0">
       {/* Global Animated Background Mesh */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1] overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#14B8A6] rounded-full mix-blend-screen filter blur-[120px] opacity-[0.04] animate-blob" />
-        <div className="absolute top-[20%] right-[-5%] w-[400px] h-[400px] bg-[#2DD4BF] rounded-full mix-blend-screen filter blur-[100px] opacity-[0.05] animate-blob animation-delay-2000" />
-        <div className="absolute bottom-[-15%] left-[10%] w-[600px] h-[600px] bg-[#38F2C2] rounded-full mix-blend-screen filter blur-[140px] opacity-[0.03] animate-blob animation-delay-4000" />
-        <div className="absolute top-[40%] left-[40%] w-[300px] h-[300px] bg-[#0A1C28] rounded-full mix-blend-overlay filter blur-[80px] opacity-[0.8]" />
-        <div className="absolute inset-0 bg-[#05080c] mix-blend-overlay opacity-90"></div>
-      </div>
+        <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1] overflow-hidden bg-[#05080c]">
+            <Plasma 
+              color="#14B8A6"
+              speed={0.6}
+              direction="forward"
+              scale={1.1}
+              opacity={0.6}
+              mouseInteractive={true}
+            />
+        </div>
 
       <SeoHeader />
 

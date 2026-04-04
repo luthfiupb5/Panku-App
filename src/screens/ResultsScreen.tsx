@@ -70,7 +70,7 @@ export const ResultsScreen: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="relative rounded-[24px] p-6 overflow-hidden shadow-[0_8px_32px_rgba(45,212,191,0.25)] border border-white/20 bg-teal-gradient"
                     >
-                        <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/30 rounded-full blur-2xl mix-blend-overlay" />
+                        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)' }} />
                         <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Expense</p>
                         <h3 className="text-4xl font-black text-[#030609] tracking-tight">{formatCurrency(totalExpense)}</h3>
                         <div className="mt-4 pt-4 border-t border-[#030609]/15 flex justify-between text-sm relative z-10">

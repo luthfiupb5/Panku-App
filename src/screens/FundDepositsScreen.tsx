@@ -42,7 +42,7 @@ export const FundDepositsScreen: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="relative rounded-[24px] p-6 mb-6 overflow-hidden shadow-[0_8px_32px_rgba(45,212,191,0.25)] border border-white/20 bg-teal-gradient"
             >
-                <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/30 rounded-full blur-xl mix-blend-overlay" />
+                <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)' }} />
                 <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Total Pool</p>
                 <h3 className="text-4xl font-black text-[#030609] tracking-tight">{formatCurrency(totalFund)}</h3>
                 <div className="mt-2 text-sm text-[#030609]/80 font-medium z-10 relative">

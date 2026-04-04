@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { SplitterEvent, Member, Expense, FundDeposit } from '../types';
+import type { SplitterEvent, Member, Expense, FundDeposit, Transaction } from '../types';
 
 interface AppContextType {
     events: SplitterEvent[];
@@ -15,6 +15,9 @@ interface AppContextType {
     removeExpense: (expenseId: string) => void;
     addFundDeposit: (deposit: Omit<FundDeposit, 'id'>) => void;
     removeFundDeposit: (depositId: string) => void;
+    updateMember: (memberId: string, updates: Partial<Member>) => void;
+    addTransaction: (transaction: Omit<Transaction, 'id' | 'timestamp'>) => void;
+    markTransactionPaid: (transactionId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -57,7 +60,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             members: initialMembers,
             expenses: [],
             mode,
-            fundDeposits: mode === 'fund' ? [] : undefined
+            fundDeposits: mode === 'fund' ? [] : undefined,
+            transactions: []
         };
         setEvents(prev => [newEvent, ...prev]);
         setActiveEventIdState(newEvent.id);
@@ -97,6 +101,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ));
     };
 
+    const updateMember = (memberId: string, updates: Partial<Member>) => {
+        setEvents(prev => prev.map(e =>
+            e.id === activeEventId
+                ? { ...e, members: e.members.map(m => m.id === memberId ? { ...m, ...updates } : m) }
+                : e
+        ));
+    };
+
     const addExpense = (expense: Expense) => {
         setEvents(prev => prev.map(e =>
             e.id === activeEventId ? { ...e, expenses: [...e.expenses, expense] } : e
@@ -127,6 +139,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ));
     };
 
+    const addTransaction = (transaction: Omit<Transaction, 'id' | 'timestamp'>) => {
+        const newTransaction: Transaction = {
+            ...transaction,
+            id: crypto.randomUUID(),
+            timestamp: new Date().toISOString()
+        };
+        setEvents(prev => prev.map(e =>
+            e.id === activeEventId
+                ? { ...e, transactions: [...(e.transactions || []), newTransaction] }
+                : e
+        ));
+    };
+
+    const markTransactionPaid = (transactionId: string) => {
+        setEvents(prev => prev.map(e =>
+            e.id === activeEventId
+                ? {
+                    ...e,
+                    transactions: (e.transactions || []).map(t =>
+                        t.id === transactionId ? { ...t, status: 'paid' } : t
+                    )
+                }
+                : e
+        ));
+    };
+
     return (
         <AppContext.Provider value={{
             events,
@@ -142,6 +180,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             removeExpense,
             addFundDeposit,
             removeFundDeposit,
+            updateMember,
+            addTransaction,
+            markTransactionPaid,
         }}>
             {children}
         </AppContext.Provider>

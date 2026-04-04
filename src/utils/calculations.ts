@@ -40,6 +40,24 @@ export const calculateBalances = (event: SplitterEvent): MemberBalance[] => {
         }
     });
 
+    if (event.transactions) {
+        event.transactions.forEach(t => {
+            if (t.status === 'paid') {
+                if (balances[t.from_member_id]) {
+                    balances[t.from_member_id].totalPaid += t.amount;
+                }
+                // Because the prompt states from_member paid the to_member directly (a settlement),
+                // this acts as an actual payment outside the system. To correctly balance it natively:
+                // `from_member` effectively paid for `to_member`'s share.
+                // Or simply: Add it to from's totalPaid and to's totalShare.
+                // That way, `from`'s balance goes up by amount, and `to`'s goes down by amount.
+                if (balances[t.to_member_id]) {
+                    balances[t.to_member_id].totalShare += t.amount;
+                }
+            }
+        });
+    }
+
     // Calculate final balances
     const result = Object.values(balances).map(b => {
         // Round to 2 decimal places to avoid floating point issues
