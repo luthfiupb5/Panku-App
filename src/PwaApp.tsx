@@ -27,17 +27,18 @@ const AppContent: React.FC = () => {
     }
 
     const isFundMode = currentEvent.mode === 'fund';
+    const iconSize = isFundMode ? 18 : 20;
     const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = isFundMode ? [
-        { id: 'home',     label: 'Home',     icon: <Home size={20} /> },
-        { id: 'fund',     label: 'Deposits', icon: <Wallet size={20} /> },
-        { id: 'expenses', label: 'Expenses', icon: <Receipt size={20} /> },
-        { id: 'summary',  label: 'Summary',  icon: <PieChart size={20} /> },
-        { id: 'report',   label: 'Report',   icon: <BarChart3 size={20} /> },
+        { id: 'home',     label: 'Home',     icon: <Home size={iconSize} /> },
+        { id: 'fund',     label: 'Deposits', icon: <Wallet size={iconSize} /> },
+        { id: 'expenses', label: 'Expenses', icon: <Receipt size={iconSize} /> },
+        { id: 'summary',  label: 'Summary',  icon: <PieChart size={iconSize} /> },
+        { id: 'report',   label: 'Report',   icon: <BarChart3 size={iconSize} /> },
     ] : [
-        { id: 'home',     label: 'Home',     icon: <Home size={20} /> },
-        { id: 'expenses', label: 'Expenses', icon: <Receipt size={20} /> },
-        { id: 'summary',  label: 'Summary',  icon: <PieChart size={20} /> },
-        { id: 'report',   label: 'Report',   icon: <BarChart3 size={20} /> },
+        { id: 'home',     label: 'Home',     icon: <Home size={iconSize} /> },
+        { id: 'expenses', label: 'Expenses', icon: <Receipt size={iconSize} /> },
+        { id: 'summary',  label: 'Summary',  icon: <PieChart size={iconSize} /> },
+        { id: 'report',   label: 'Report',   icon: <BarChart3 size={iconSize} /> },
     ];
 
     return (
@@ -63,15 +64,25 @@ const AppContent: React.FC = () => {
                 </AnimatePresence>
             </main>
 
-            {/* Floating pill navigation */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-safe-or-6 pb-6 px-3 pointer-events-none">
+            {/* Bottom navigation */}
+            <div
+                className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
+                style={{
+                    paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+                    paddingLeft: '12px',
+                    paddingRight: '12px',
+                }}
+            >
                 <nav
-                    className="pointer-events-auto flex items-center w-full p-1.5 rounded-2xl"
+                    className="pointer-events-auto flex items-stretch w-full rounded-2xl overflow-hidden"
                     style={{
-                        background: 'rgba(10, 28, 40, 0.85)',
+                        background: 'rgba(10, 28, 40, 0.92)',
                         backdropFilter: 'blur(32px)',
-                        border: '1px solid rgba(255,255,255,0.06)',
+                        WebkitBackdropFilter: 'blur(32px)',
+                        border: '1px solid rgba(255,255,255,0.08)',
                         boxShadow: '0 16px 40px -4px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)',
+                        padding: '6px',
+                        gap: '2px',
                     }}
                 >
                     {tabs.map(tab => {
@@ -80,7 +91,8 @@ const AppContent: React.FC = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className="relative flex-1 flex flex-col items-center justify-center px-0.5 py-2 rounded-xl focus:outline-none transition-all min-w-0"
+                                style={{ flex: '1 1 0', minWidth: 0 }}
+                                className="relative flex flex-col items-center justify-center py-2 rounded-xl focus:outline-none transition-all"
                             >
                                 {isActive && (
                                     <motion.div
@@ -89,9 +101,11 @@ const AppContent: React.FC = () => {
                                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                                     />
                                 )}
-                                <span className={`relative flex flex-col items-center gap-0.5 transition-colors duration-200 w-full ${isActive ? 'text-[#030609]' : 'text-[#9AA4AF] hover:text-[#E8EDF2]'}`}>
-                                    {/* Badge for expenses count */}
-                                    <span className="relative">
+                                <span
+                                    className="relative flex flex-col items-center transition-colors duration-200"
+                                    style={{ gap: '3px', color: isActive ? '#030609' : '#9AA4AF' }}
+                                >
+                                    <span className="relative flex-shrink-0">
                                         {tab.icon}
                                         {tab.id === 'expenses' && currentEvent.expenses.length > 0 && !isActive && (
                                             <span className="absolute -top-1 -right-2.5 bg-[#2DD4BF] text-[#030609] text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
@@ -99,7 +113,21 @@ const AppContent: React.FC = () => {
                                             </span>
                                         )}
                                     </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-wide leading-none truncate w-full text-center">{tab.label}</span>
+                                    <span
+                                        style={{
+                                            fontSize: isFundMode ? '8px' : '9px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.04em',
+                                            lineHeight: 1,
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            maxWidth: '100%',
+                                        }}
+                                    >
+                                        {tab.label}
+                                    </span>
                                 </span>
                             </button>
                         );
