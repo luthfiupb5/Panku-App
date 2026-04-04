@@ -181,7 +181,7 @@ export const SettlementModal: React.FC<SettlementModalProps> = ({ onClose }) => 
                                                     {/* QR Code Segment */}
                                                     <div className="shrink-0 p-3 bg-white rounded-2xl shadow-lg relative">
                                                         {upiLink ? (
-                                                            <QRCodeCanvas id={`qr-${payerId}-${p.to}`} value={upiLink} size={110} level="M" />
+                                                            <QRCodeCanvas id={`qr-${payerId}-${p.to}`} value={upiLink} size={110} level="M" includeMargin={true} />
                                                         ) : (
                                                             <div className="w-[110px] h-[110px] bg-gray-100 flex flex-col items-center justify-center text-gray-400 rounded-xl border-2 border-dashed border-gray-300">
                                                                 <ShieldAlert size={28} className="mb-2" />
