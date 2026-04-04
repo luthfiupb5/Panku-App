@@ -8,6 +8,7 @@ import { SplitwiseAlternative } from './pages/seo/SplitwiseAlternative';
 import { GroupTripTracking, OfflineTracker, CollegeTrip } from './pages/seo/OtherBlogs';
 import { CompareSplitwise } from './pages/seo/CompareSplitwise';
 import { DinnerSplitPage, HowItWorksPage } from './pages/seo/UseCases';
+import { ComingSoonPage } from './pages/seo/ComingSoonPage';
 
 export const routes: RouteObject[] = [
     {
@@ -27,6 +28,8 @@ export const routes: RouteObject[] = [
             { path: '/use-cases/college-trip-expenses', element: <CollegeTrip /> },
             { path: '/use-cases/group-dinner-bill-split', element: <DinnerSplitPage /> },
             { path: '/compare/panku-vs-splitwise', element: <CompareSplitwise /> },
+            { path: '/comingsoon', element: <ComingSoonPage /> },
+            { path: '/comingsoon/', element: <ComingSoonPage /> },
         ]
     }
 ];
