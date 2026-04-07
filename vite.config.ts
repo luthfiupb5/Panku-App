@@ -104,6 +104,8 @@ export default defineConfig({
         ],
         // Pre-cache all static assets built by Vite
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        navigateFallback: '/',
+        navigateFallbackDenylist: [/^\/sitemap\.xml$/, /^\/robots\.txt$/],
       },
       devOptions: {
         enabled: true, // Enable PWA in dev mode for testing
