@@ -3,6 +3,7 @@ import type { SplitterEvent, Member, Expense, FundDeposit, Transaction } from '.
 
 interface AppContextType {
     events: SplitterEvent[];
+    contacts: Member[];
     activeEventId: string | null;
     currentEvent: SplitterEvent | null;
     createEvent: (name: string, date: string, members?: Member[], mode?: 'normal' | 'fund') => void;
@@ -24,11 +25,19 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'panku_events_v2';
 const ACTIVE_KEY = 'panku_active_event';
+const CONTACTS_KEY = 'panku_contacts_v2';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [events, setEvents] = useState<SplitterEvent[]>(() => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
+
+    const [contacts, setContacts] = useState<Member[]>(() => {
+        try {
+            const saved = localStorage.getItem(CONTACTS_KEY);
             return saved ? JSON.parse(saved) : [];
         } catch { return []; }
     });
@@ -41,6 +50,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     useEffect(() => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
     }, [events]);
+
+    useEffect(() => {
+        localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
+    }, [contacts]);
 
     useEffect(() => {
         if (activeEventId) {
@@ -81,10 +94,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveEventIdState(null);
     };
 
+    const upsertContact = (name: string, upi_id?: string) => {
+        setContacts(prev => {
+            const existing = prev.find(c => c.name.toLowerCase() === name.toLowerCase());
+            if (existing) {
+                if (upi_id && existing.upi_id !== upi_id) {
+                    return prev.map(c => c.id === existing.id ? { ...c, upi_id } : c);
+                }
+                return prev;
+            }
+            return [...prev, { id: crypto.randomUUID(), name, upi_id }];
+        });
+    };
+
     const addMember = (member: Member) => {
         setEvents(prev => prev.map(e =>
             e.id === activeEventId ? { ...e, members: [...e.members, member] } : e
         ));
+        upsertContact(member.name, member.upi_id);
     };
 
     const removeMember = (memberId: string) => {
@@ -102,11 +129,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     const updateMember = (memberId: string, updates: Partial<Member>) => {
-        setEvents(prev => prev.map(e =>
-            e.id === activeEventId
-                ? { ...e, members: e.members.map(m => m.id === memberId ? { ...m, ...updates } : m) }
-                : e
-        ));
+        setEvents(prev => prev.map(e => {
+            if (e.id !== activeEventId) return e;
+            const updatedMembers = e.members.map(m => {
+                if (m.id === memberId) {
+                    const updated = { ...m, ...updates };
+                    upsertContact(updated.name, updated.upi_id);
+                    return updated;
+                }
+                return m;
+            });
+            return { ...e, members: updatedMembers };
+        }));
     };
 
     const addExpense = (expense: Expense) => {
@@ -168,6 +202,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return (
         <AppContext.Provider value={{
             events,
+            contacts,
             activeEventId,
             currentEvent,
             createEvent,

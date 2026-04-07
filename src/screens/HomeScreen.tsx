@@ -9,23 +9,12 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const { createEvent } = useAppContext();
     const [name, setName] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [memberInput, setMemberInput] = useState('');
-    const [members, setMembers] = useState<string[]>([]);
     const [mode, setMode] = useState<'normal' | 'fund'>('normal');
-
-    const addMember = () => {
-        const trimmed = memberInput.trim();
-        if (trimmed && !members.includes(trimmed)) {
-            setMembers(prev => [...prev, trimmed]);
-            setMemberInput('');
-        }
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) return;
-        const memberObjects = members.map(m => ({ id: crypto.randomUUID(), name: m }));
-        createEvent(name.trim(), date, memberObjects, mode);
+        createEvent(name.trim(), date, [], mode);
         onClose();
     };
 
@@ -78,47 +67,6 @@ const CreateEventModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 value={date}
                                 onChange={e => setDate(e.target.value)}
                             />
-                        </div>
-
-                        {/* Members */}
-                        <div>
-                            <label className="block text-xs font-semibold text-[#9AA4AF] uppercase tracking-wider mb-2">Add Members (optional)</label>
-                            <div className="flex gap-2">
-                                <input
-                                    className="panku-input flex-1"
-                                    placeholder="Enter name and press +"
-                                    value={memberInput}
-                                    onChange={e => setMemberInput(e.target.value)}
-                                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } }}
-                                />
-                                    <button
-                                        type="button"
-                                        onClick={addMember}
-                                        className="w-11 h-11 rounded-xl flex items-center justify-center btn-teal text-[#030609] font-bold shrink-0"
-                                    >
-                                        <Plus size={20} />
-                                    </button>
-                            </div>
-                            {/* Member chips */}
-                            {members.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    {members.map(m => (
-                                        <span
-                                            key={m}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-[#030609] bg-teal-gradient"
-                                        >
-                                            {m}
-                                            <button
-                                                type="button"
-                                                onClick={() => setMembers(prev => prev.filter(x => x !== m))}
-                                                className="text-[#030609]/60 hover:text-[#030609] transition-colors"
-                                            >
-                                                <X size={12} />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
                         {/* Event Mode */}

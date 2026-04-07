@@ -8,8 +8,8 @@ const AVATAR = ['avatar-0','avatar-1','avatar-2','avatar-3','avatar-4','avatar-5
 const getAvatarClass = (name: string) => AVATAR[name.charCodeAt(0) % AVATAR.length];
 
 export const DashboardScreen: React.FC = () => {
-    const { currentEvent, addMember, removeMember, updateMember } = useAppContext();
-    const [isAdding, setIsAdding] = useState(false);
+    const { currentEvent, addMember, removeMember, updateMember, contacts } = useAppContext();
+    const [isAdding, setIsAdding] = useState(currentEvent?.members.length === 0);
     const [newMemberName, setNewMemberName] = useState('');
 
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,6 +59,11 @@ export const DashboardScreen: React.FC = () => {
         updateMember(editingId, { name: editName.trim(), upi_id: editUpi.trim() || undefined });
         setEditingId(null);
     };
+
+    const suggestedContacts = contacts.filter(
+        c => !currentEvent.members.some(m => m.name.toLowerCase() === c.name.toLowerCase()) &&
+             c.name.toLowerCase().includes(newMemberName.toLowerCase())
+    );
 
     return (
         <div className="space-y-6">
@@ -139,24 +144,48 @@ export const DashboardScreen: React.FC = () => {
 
                 <AnimatePresence>
                     {isAdding && (
-                        <motion.form 
+                        <motion.div 
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            onSubmit={handleAddMember} 
-                            className="flex gap-2 mb-3 overflow-hidden"
+                            className="mb-4 overflow-hidden"
                         >
-                            <input 
-                                className="panku-input flex-1 py-2.5 text-sm" 
-                                placeholder="Member name..." 
-                                value={newMemberName} 
-                                onChange={e => setNewMemberName(e.target.value)} 
-                                autoFocus 
-                            />
-                            <button type="submit" className="btn-teal px-5 py-2.5 rounded-xl font-bold text-sm shrink-0">
-                                Save
-                            </button>
-                        </motion.form>
+                            <form onSubmit={handleAddMember} className="flex gap-2">
+                                <input 
+                                    className="panku-input flex-1 py-2.5 text-sm" 
+                                    placeholder="Enter new name or search..." 
+                                    value={newMemberName} 
+                                    onChange={e => setNewMemberName(e.target.value)} 
+                                    autoFocus 
+                                />
+                                <button type="submit" className="btn-teal px-5 py-2.5 rounded-xl font-bold text-sm shrink-0">
+                                    Add
+                                </button>
+                            </form>
+                            
+                            {suggestedContacts.length > 0 && (
+                                <div className="mt-3 bg-white/5 rounded-xl p-3 border border-white/5">
+                                    <p className="text-[10px] uppercase font-bold text-[#9AA4AF] mb-2 tracking-wider ml-1">Suggested Members</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {suggestedContacts.slice(0, 8).map(contact => (
+                                            <button
+                                                key={contact.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    addMember({ id: crypto.randomUUID(), name: contact.name, upi_id: contact.upi_id });
+                                                    setIsAdding(false);
+                                                    setNewMemberName('');
+                                                }}
+                                                className="flex flex-col items-start bg-[#030609]/40 hover:bg-[#2DD4BF]/20 border border-white/5 hover:border-[#2DD4BF]/40 px-3 py-1.5 rounded-lg transition-colors text-left"
+                                            >
+                                                <span className="text-sm font-medium text-[#E8EDF2]">{contact.name}</span>
+                                                {contact.upi_id && <span className="text-[10px] text-[#2DD4BF] flex items-center gap-1 mt-0.5 opacity-80"><QrCode size={10} /> {contact.upi_id}</span>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </motion.div>
                     )}
                 </AnimatePresence>
 
