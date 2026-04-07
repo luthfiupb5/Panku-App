@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils/calculations';
 import { UserPlus, Trash2, Edit3, Check, X, QrCode } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AVATAR = ['avatar-0','avatar-1','avatar-2','avatar-3','avatar-4','avatar-5','avatar-6','avatar-7'];
+const AVATAR = ['avatar-0', 'avatar-1', 'avatar-2', 'avatar-3', 'avatar-4', 'avatar-5', 'avatar-6', 'avatar-7'];
 const getAvatarClass = (name: string) => AVATAR[name.charCodeAt(0) % AVATAR.length];
 
 export const DashboardScreen: React.FC = () => {
@@ -22,14 +22,14 @@ export const DashboardScreen: React.FC = () => {
 
     const isFundMode = currentEvent.mode === 'fund';
     const totalFund = isFundMode ? (currentEvent.fundDeposits || []).reduce((s, d) => s + d.amount, 0) : 0;
-    
+
     // In Fund Mode, the "Spent" from the pool is explicitly tracked via poolUsed (with legacy fallback)
-    const totalSpentFromFund = isFundMode 
+    const totalSpentFromFund = isFundMode
         ? currentEvent.expenses.reduce((s, e) => {
             if (e.poolUsed !== undefined) return s + e.poolUsed;
             const membersPaid = e.paidBy.reduce((acc, p) => acc + p.amount, 0);
             return s + (e.amount - membersPaid);
-        }, 0) 
+        }, 0)
         : totalEventCost;
 
     const remainingFund = Math.max(0, totalFund - totalSpentFromFund);
@@ -40,7 +40,7 @@ export const DashboardScreen: React.FC = () => {
         const trimmed = newMemberName.trim();
         if (!trimmed) return;
         if (currentEvent.members.some(m => m.name.toLowerCase() === trimmed.toLowerCase())) {
-            alert('Member exists'); 
+            alert('Member exists');
             return;
         }
         addMember({ id: crypto.randomUUID(), name: trimmed });
@@ -62,7 +62,7 @@ export const DashboardScreen: React.FC = () => {
 
     const suggestedContacts = contacts.filter(
         c => !currentEvent.members.some(m => m.name.toLowerCase() === c.name.toLowerCase()) &&
-             c.name.toLowerCase().includes(newMemberName.toLowerCase())
+            c.name.toLowerCase().includes(newMemberName.toLowerCase())
     );
 
     return (
@@ -79,12 +79,12 @@ export const DashboardScreen: React.FC = () => {
                 className="relative rounded-[24px] p-6 overflow-hidden shadow-[0_8px_32px_rgba(45,212,191,0.25)] border border-white/20 bg-teal-gradient"
             >
                 <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)' }} />
-                
+
                 {isFundMode ? (
                     <>
                         <p className="text-[#030609]/70 text-xs font-bold uppercase tracking-widest mb-2">Trip Pool</p>
                         <h3 className="text-4xl font-black text-[#030609] tracking-tight mb-5">{formatCurrency(totalFund)}</h3>
-                        
+
                         <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
                             <div>
                                 <p className="text-[#030609]/70 text-[10px] font-bold uppercase tracking-wider mb-0.5">Spent</p>
@@ -98,7 +98,7 @@ export const DashboardScreen: React.FC = () => {
 
                         {/* Progress Bar */}
                         <div className="bg-[#030609]/10 rounded-full h-1.5 w-full mb-1 relative z-10 overflow-hidden">
-                            <motion.div 
+                            <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${usagePercent}%` }}
                                 transition={{ duration: 1, ease: 'easeOut' }}
@@ -134,8 +134,8 @@ export const DashboardScreen: React.FC = () => {
             <div>
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-[#E8EDF2]">Members</h3>
-                    <button 
-                        onClick={() => setIsAdding(!isAdding)} 
+                    <button
+                        onClick={() => setIsAdding(!isAdding)}
                         className="text-xs text-[#030609] bg-[#2DD4BF] hover:bg-[#14B8A6] px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 transition-colors"
                     >
                         <UserPlus size={14} /> Add
@@ -144,25 +144,25 @@ export const DashboardScreen: React.FC = () => {
 
                 <AnimatePresence>
                     {isAdding && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             className="mb-4 overflow-hidden"
                         >
                             <form onSubmit={handleAddMember} className="flex gap-2">
-                                <input 
-                                    className="panku-input flex-1 py-2.5 text-sm" 
-                                    placeholder="Enter new name or search..." 
-                                    value={newMemberName} 
-                                    onChange={e => setNewMemberName(e.target.value)} 
-                                    autoFocus 
+                                <input
+                                    className="panku-input flex-1 py-2.5 text-sm"
+                                    placeholder="Enter new name or search..."
+                                    value={newMemberName}
+                                    onChange={e => setNewMemberName(e.target.value)}
+                                    autoFocus
                                 />
                                 <button type="submit" className="btn-teal px-5 py-2.5 rounded-xl font-bold text-sm shrink-0">
                                     Add
                                 </button>
                             </form>
-                            
+
                             {suggestedContacts.length > 0 && (
                                 <div className="mt-3 bg-white/5 rounded-xl p-3 border border-white/5">
                                     <p className="text-[10px] uppercase font-bold text-[#9AA4AF] mb-2 tracking-wider ml-1">Suggested Members</p>
@@ -195,7 +195,7 @@ export const DashboardScreen: React.FC = () => {
                             {currentEvent.members.map((member, i) => {
                                 const isEditing = editingId === member.id;
                                 return (
-                                    <motion.div 
+                                    <motion.div
                                         key={member.id}
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -252,15 +252,15 @@ export const DashboardScreen: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
-                                                    <button 
-                                                        onClick={() => startEdit(member)} 
+                                                    <button
+                                                        onClick={() => startEdit(member)}
                                                         className="text-[#9AA4AF] hover:text-[#2DD4BF] bg-white/5 hover:bg-[#2DD4BF]/15 p-2 rounded-lg transition-colors flex"
                                                         title="Edit member"
                                                     >
                                                         <Edit3 size={16} />
                                                     </button>
-                                                    <button 
-                                                        onClick={() => { if(window.confirm(`Remove ${member.name}?`)) removeMember(member.id); }} 
+                                                    <button
+                                                        onClick={() => { if (window.confirm(`Remove ${member.name}?`)) removeMember(member.id); }}
                                                         className="text-[#64748B] hover:text-[#EF4444] bg-white/5 hover:bg-[#EF4444]/15 p-2 rounded-lg transition-colors flex"
                                                         title="Delete member"
                                                     >
